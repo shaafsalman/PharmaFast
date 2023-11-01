@@ -1,6 +1,11 @@
 package Controllers;
 
 import Helpers.ConnectionFile;
+import com.itextpdf.text.*;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -9,15 +14,16 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
+import java.awt.Font;
 import java.io.*;
 import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.time.LocalTime;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.time.format.DateTimeFormatter;
 
 public class AdminController {
 
@@ -1267,8 +1273,131 @@ public class AdminController {
         table.getColumnModel().getColumn(1).setCellRenderer(centerRenderer);
         table.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
     }
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public static String generateReport(String reportType, String date) {
+        LocalDate day = LocalDate.now();
+        String pdfOutputFile = "src/main/resources/Reports/" + reportType + "for" + date + "_" + day + ".pdf";
+        String sql = "";
+
+        try {
+            Connection connection = DriverManager.getConnection(url, username, password);
+            Document document = new Document();
+            PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(pdfOutputFile));
+            document.open();
+
+            // Add logo
+            Image logo = Image.getInstance("src/main/resources/Material/apple-touch-icon.png");
+            logo.setAlignment(Element.ALIGN_CENTER);
+            logo.scaleAbsolute(45, 45);
+            document.add(logo);
+
+            // Header
+            Paragraph header = new Paragraph("PharmaFast - " + reportType + " Report - " + date + "\n\n",
+                    FontFactory.getFont("Century Gothic", 18, BaseColor.BLACK));
+            header.setAlignment(Element.ALIGN_CENTER);
+            document.add(header);
+
+            // SQL details in table format
+            PdfPTable table = new PdfPTable(4); // Change the number of columns to 4
+            table.setWidthPercentage(100);
+            table.addCell(getHeaderCell("Transaction ID"));
+            table.addCell(getHeaderCell("UserID"));
+            table.addCell(getHeaderCell("TotalCost"));
+            table.addCell(getHeaderCell("Transaction Date"));
+
+            PreparedStatement statement;
+            ResultSet resultSet;
+
+            if (reportType.equals("daily")) {
+                sql = "SELECT TransactionID, UserID, TotalCost, TransactionDate " +
+                        "FROM Transactions " +
+                        "WHERE CONVERT(DATE, TransactionDate) = ?";
+
+            }
+            else if (reportType.equals("monthly"))
+            {
+                sql = "SELECT TransactionID, UserID, TotalCost, TransactionDate " +
+                        "FROM Transactions " +
+                        "WHERE YEAR(TransactionDate) = ? AND MONTH(TransactionDate) = ?";
+
+            }
+            else if (reportType.equals("yearly")) {
+                sql = "SELECT TransactionID, UserID, TotalCost, TransactionDate " +
+                        "FROM Transactions " +
+                        "WHERE YEAR(TransactionDate) = YEAR(?)";
+            }
+
+            statement = connection.prepareStatement(sql);
+
+            if (reportType.equals("daily")) {
+                statement.setString(1, date);
+            }
+            else if (reportType.equals("monthly"))
+            {
+                String[] parts = date.split("-");
+                String year = parts[0];
+                String month = parts[1];
+                System.out.println(Integer.parseInt(year));
+                System.out.println(Integer.parseInt(month));
+
+                statement.setInt(1, Integer.parseInt(year));
+                statement.setInt(2, Integer.parseInt(month));
+            }
+            else if (reportType.equals("yearly"))
+            {
+                statement.setString(1, date);
+            }
+
+
+            resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                table.addCell(getCell(String.valueOf(resultSet.getInt("TransactionID"))));
+                table.addCell(getCell(String.valueOf(resultSet.getInt("UserID"))));
+                table.addCell(getCell(String.valueOf(resultSet.getDouble("TotalCost"))));
+                table.addCell(getCell(String.valueOf(resultSet.getTimestamp("TransactionDate"))));
+            }
+
+            document.add(table);
+
+            // Footer with date
+            Paragraph footer = new Paragraph("Report generated on: " + LocalDate.now(),
+                    FontFactory.getFont("Century Gothic", 12, BaseColor.BLACK));
+            footer.setAlignment(Element.ALIGN_RIGHT);
+            document.add(footer);
+
+            document.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return pdfOutputFile;
+    }
+    private static PdfPCell getCell(String content) {
+        PdfPCell cell = new PdfPCell(new Phrase(content, FontFactory.getFont("Century Gothic", 12, BaseColor.BLACK)));
+        cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        return cell;
+    }
+    private static PdfPCell getHeaderCell(String content) {
+        com.itextpdf.text.Font font = FontFactory.getFont("Century Gothic", 14, BaseColor.WHITE);
+        PdfPCell cell = new PdfPCell(new Phrase(content, font));
+        cell.setBackgroundColor(BaseColor.DARK_GRAY);
+        cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        return cell;
+    }
+
+
+    public static void main(String[] args) {
+        //String yearlyReport = generateReport("yearly", "2023");
+        //String monthlyReport = generateReport("monthly", "2023-10");
+        //String dailyReport = generateReport("daily", "2023-10-15");
+
+    }
+
 
 
 }
+
+
 
 

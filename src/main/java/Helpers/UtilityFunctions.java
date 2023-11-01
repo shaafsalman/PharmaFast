@@ -1,6 +1,7 @@
 package Helpers;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -81,6 +82,28 @@ public class UtilityFunctions {
             return false;
         }
     }
+    public void displayReport(String filePath) {
+        if (filePath != null && !filePath.isEmpty()) {
+            // Assuming the filePath is a path to the generated report file
+            File reportFile = new File(filePath);
+
+            if (reportFile.exists()) {
+                // If the file exists, you can open it or perform any action here
+                try {
+                    Desktop.getDesktop().open(reportFile); // Opens the file using the system default application
+                } catch (IOException e) {
+                    e.printStackTrace(); // Handle the error if the file cannot be opened
+                }
+            } else {
+                // Handle case where the file does not exist
+                JOptionPane.showMessageDialog(null, "The generated report file does not exist.");
+            }
+        } else {
+            // Handle case where the file path is empty or null
+            JOptionPane.showMessageDialog(null, "No report file generated.");
+        }
+    }
+
     public static boolean placeRestockOrder(String productName, String category, int currentQuantity, int newQuantity) {
         LocalDate today = LocalDate.now();
         String filePath = "src/main/resources/StockRequests";
@@ -92,7 +115,7 @@ public class UtilityFunctions {
         }
 
         String fileName = "StockRequest_" + today + ".txt";
-        String orderDetails = productName + " (" + category + "): Restock order - " + newQuantity + " added on " + today;
+        String orderDetails = productName + " (" + category + "): Restock order - " + newQuantity + " Requested on " + today;
 
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(filePath + File.separator + fileName, true)); // Append mode

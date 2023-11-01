@@ -24,14 +24,6 @@ CREATE TABLE Products (
 );
 
 -- Create InventoryLog table for product quantity changes
-CREATE TABLE InventoryLogs (
-    LogID INT IDENTITY(1, 1) PRIMARY KEY,
-    ProductID INT,
-    LogDate DATE NOT NULL,
-    LogType VARCHAR(20) NOT NULL,
-    Quantity INT NOT NULL,
-    FOREIGN KEY (ProductID) REFERENCES Products(ProductID)
-);
 
 -- Create Transaction table for point of sale transactions
 CREATE TABLE Transactions (

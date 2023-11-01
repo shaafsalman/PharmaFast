@@ -200,7 +200,9 @@ public class manageProducts extends javax.swing.JFrame {
 
 
 
-
+    JComboBox<String> yearComboBox = uf.createExpiryYearComboBox();
+    JComboBox<String> monthComboBox = uf.createMonthComboBox();
+    JComboBox<String> dayComboBox = uf.createDayComboBox();
     //////////////////////////////////////////////////////////////////////////////////////////////
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
