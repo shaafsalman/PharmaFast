@@ -103,7 +103,6 @@ public class UtilityFunctions {
             JOptionPane.showMessageDialog(null, "No report file generated.");
         }
     }
-
     public static boolean placeRestockOrder(String productName, String category, int currentQuantity, int newQuantity) {
         LocalDate today = LocalDate.now();
         String filePath = "src/main/resources/StockRequests";
@@ -128,6 +127,7 @@ public class UtilityFunctions {
         }
         return false;
     }
+
 
 
 }

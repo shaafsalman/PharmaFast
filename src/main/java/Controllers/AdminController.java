@@ -1385,6 +1385,135 @@ public class AdminController {
         cell.setHorizontalAlignment(Element.ALIGN_CENTER);
         return cell;
     }
+    public String generateRecipt(JTable tableCart, String total, String subTotal, String vat, String paidAmount, String change) {
+        LocalDate day = LocalDate.now();
+        String pdfOutputFile = "src/main/resources/Recipts/Report_" + day + ".pdf";
+
+        try {
+            Document document = new Document();
+            PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(pdfOutputFile));
+            document.open();
+
+            // Add logo
+            Image logo = Image.getInstance("src/main/resources/Material/apple-touch-icon.png");
+            logo.setAlignment(Element.ALIGN_CENTER);
+            logo.scaleAbsolute(45, 45);
+            document.add(logo);
+
+            // Header with Title
+            Paragraph title = new Paragraph("PharmaFast - Recipt\n\n",
+                    FontFactory.getFont("Century Gothic", 18, BaseColor.BLACK));
+            title.setAlignment(Element.ALIGN_CENTER);
+            document.add(title);
+
+            // Add Table Contents
+            PdfPTable cartTable = new PdfPTable(6); // Change the number of columns based on your cart table
+            cartTable.setWidthPercentage(100);
+
+            // Add Table Headers
+            cartTable.addCell(getHeaderCell("Product ID"));
+            cartTable.addCell(getHeaderCell("Product Name"));
+            cartTable.addCell(getHeaderCell("Category"));
+            cartTable.addCell(getHeaderCell("Price"));
+            cartTable.addCell(getHeaderCell("Quantity"));
+            cartTable.addCell(getHeaderCell("Total Price"));
+
+            // Fetch cart details from JTable
+            DefaultTableModel model = (DefaultTableModel) tableCart.getModel();
+            for (int i = 0; i < model.getRowCount(); i++) {
+                cartTable.addCell(getCell(model.getValueAt(i, 0).toString())); // Product ID
+                cartTable.addCell(getCell(model.getValueAt(i, 1).toString())); // Product Name
+                cartTable.addCell(getCell(model.getValueAt(i, 2).toString())); // Category
+                cartTable.addCell(getCell(model.getValueAt(i, 3).toString())); // Price
+                cartTable.addCell(getCell(model.getValueAt(i, 4).toString())); // Quantity
+                cartTable.addCell(getCell(model.getValueAt(i, 5).toString())); // Total Price
+            }
+
+            document.add(cartTable);
+
+            // Other Details
+
+            Paragraph totalParagraph = new Paragraph("Total: " + total);
+            totalParagraph.setAlignment(Element.ALIGN_RIGHT);
+            document.add(totalParagraph);
+
+            Paragraph subTotalParagraph = new Paragraph("Subtotal: " + subTotal);
+            subTotalParagraph.setAlignment(Element.ALIGN_RIGHT);
+            document.add(subTotalParagraph);
+
+            Paragraph vatParagraph = new Paragraph("VAT: " + vat);
+            vatParagraph.setAlignment(Element.ALIGN_RIGHT);
+            document.add(vatParagraph);
+
+            Paragraph paidAmountParagraph = new Paragraph("Paid Amount: " + paidAmount);
+            paidAmountParagraph.setAlignment(Element.ALIGN_RIGHT);
+            document.add(paidAmountParagraph);
+
+            Paragraph changeParagraph = new Paragraph("Change: " + change);
+            changeParagraph.setAlignment(Element.ALIGN_RIGHT);
+            document.add(changeParagraph);
+
+
+            // Footer with date
+            Paragraph footer = new Paragraph("\n\n\nReport generated on: " + LocalDate.now(),
+                    FontFactory.getFont("Century Gothic", 12, BaseColor.BLACK));
+            footer.setAlignment(Element.ALIGN_CENTER);
+            document.add(footer);
+
+            document.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return pdfOutputFile;
+    }
+
+//    private void updateDatabase(JTable tableCart) {
+//        DefaultTableModel model = (DefaultTableModel) tableCart.getModel();
+//
+//        try (Connection connection = DriverManager.getConnection(url, username, password)) {
+//            // Add the sold items to the Transactions and TransactionItems tables
+//            String insertTransactionQuery = "INSERT INTO Transactions (UserID, TotalCost, TransactionDate) VALUES (?, ?, ?)";
+//            String insertTransactionItemQuery = "INSERT INTO TransactionItems (TransactionID, ProductID, Quantity) VALUES (?, ?, ?)";
+//
+//            PreparedStatement insertTransactionStatement = connection.prepareStatement(insertTransactionQuery, Statement.RETURN_GENERATED_KEYS);
+//            PreparedStatement insertTransactionItemStatement = connection.prepareStatement(insertTransactionItemQuery);
+//
+//            // Set parameters for the Transactions table
+//            insertTransactionStatement.setInt(1, userId); // Replace userId with the actual user ID
+//            insertTransactionStatement.setDouble(2, Double.parseDouble(total));
+//            insertTransactionStatement.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now()));
+//
+//            // Execute the insert statement for Transactions
+//            int rowsAffected = insertTransactionStatement.executeUpdate();
+//
+//            if (rowsAffected > 0) {
+//                // Retrieve the generated transaction ID
+//                ResultSet generatedKeys = insertTransactionStatement.getGeneratedKeys();
+//                int transactionID = -1;
+//                if (generatedKeys.next()) {
+//                    transactionID = generatedKeys.getInt(1);
+//                }
+//
+//                if (transactionID != -1) {
+//                    // Iterate through the items in the cart and add them to the TransactionItems table
+//                    for (int i = 0; i < model.getRowCount(); i++) {
+//                        int productID = Integer.parseInt(model.getValueAt(i, 0).toString());
+//                        int quantity = Integer.parseInt(model.getValueAt(i, 4).toString());
+//
+//                        // Set parameters for the TransactionItems table
+//                        insertTransactionItemStatement.setInt(1, transactionID);
+//                        insertTransactionItemStatement.setInt(2, productID);
+//                        insertTransactionItemStatement.setInt(3, quantity);
+//
+//                        // Execute the insert statement for TransactionItems
+//                        insertTransactionItemStatement.executeUpdate();
+//                    }
+//                }
+//            }
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
 
     public static void main(String[] args) {
