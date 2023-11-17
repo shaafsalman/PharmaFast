@@ -1,6 +1,10 @@
 package Helpers;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -12,8 +16,7 @@ import java.time.LocalDate;
 import java.util.Calendar;
 
 public class UtilityFunctions {
-    public JComboBox<String> createYearComboBox()
-    {
+    public JComboBox<String> createYearComboBox() {
         JComboBox<String> yearComboBox = new JComboBox<>();
 
         int currentYear = Calendar.getInstance().get(Calendar.YEAR);
@@ -24,8 +27,7 @@ public class UtilityFunctions {
 
         return yearComboBox;
     }
-    public JComboBox<String> createExpiryYearComboBox()
-    {
+    public JComboBox<String> createExpiryYearComboBox() {
         JComboBox<String> yearComboBox = new JComboBox<>();
 
         int currentYear = Calendar.getInstance().get(Calendar.YEAR);
@@ -36,8 +38,7 @@ public class UtilityFunctions {
 
         return yearComboBox;
     }
-    public JComboBox<String> createMonthComboBox()
-    {
+    public JComboBox<String> createMonthComboBox() {
         JComboBox<String> monthComboBox = new JComboBox<>();
 
         // Populate the months (1 to 12)
@@ -84,7 +85,6 @@ public class UtilityFunctions {
     }
     public void displayReport(String filePath) {
         if (filePath != null && !filePath.isEmpty()) {
-            // Assuming the filePath is a path to the generated report file
             File reportFile = new File(filePath);
 
             if (reportFile.exists()) {
@@ -128,6 +128,40 @@ public class UtilityFunctions {
         return false;
     }
 
+    public static void initializeUForTable(JTable table) {
+
+
+        table.setRowHeight(40);
+
+        table.setOpaque(false);
+        table.setShowGrid(false);
+        table.setBackground(new Color(255, 255, 255));
+        table.setSelectionBackground(new Color(52, 52, 52));
+
+        class HeaderRenderer extends DefaultTableCellRenderer {
+            public HeaderRenderer() {
+                setHorizontalAlignment(SwingConstants.CENTER);
+            }
+        }
+
+        JTableHeader header = table.getTableHeader();
+        header.setFont(new Font("Century Gothic", Font.PLAIN, 18));
+        header.setBackground(new Color(47, 47, 47));
+        header.setForeground(Color.darkGray);
+        header.setBorder(new EmptyBorder(20, 10, 20, 10));
+
+        TableCellRenderer headerRenderer = new HeaderRenderer();
+        table.getTableHeader().setDefaultRenderer(headerRenderer);
+
+        table.setFont(new Font("Century Gothic", Font.PLAIN, 14));
+
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+        table.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
+        table.getColumnModel().getColumn(1).setCellRenderer(centerRenderer);
+        table.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
+
+    }
 
 
 }

@@ -6,6 +6,7 @@ package Views;
  */
 
 import Controllers.AdminController;
+import Helpers.ReportGenerator;
 import Helpers.UtilityFunctions;
 
 import javax.swing.*;
@@ -17,18 +18,19 @@ import java.sql.SQLException;
  */
 public class manageReports extends javax.swing.JFrame {
 
-    /**
-     * Creates new form manageReports
-     */
+    ReportGenerator reportGenerator = new ReportGenerator();
     UtilityFunctions uf = new UtilityFunctions();
-    AdminController adController = new AdminController();
-    public manageReports() throws SQLException {
-        initComponents();
-    }
 
     JComboBox<String> yearComboBox = uf.createYearComboBox();
     JComboBox<String> monthComboBox = uf.createMonthComboBox();
     JComboBox<String> dayComboBox = uf.createDayComboBox();
+
+
+    public manageReports() throws SQLException {
+        initComponents();
+    }
+
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">
     private void initComponents() {
@@ -292,7 +294,7 @@ public class manageReports extends javax.swing.JFrame {
 
             int option = JOptionPane.showConfirmDialog(null, message, "Monthly Report", JOptionPane.OK_CANCEL_OPTION);
             if (option == JOptionPane.OK_OPTION) {
-                String filePath = adController.generateReport("monthly", date);
+                String filePath = reportGenerator.generateReport("monthly", date);
                 if (filePath != null && !filePath.isEmpty()) {
                     uf.displayReport(filePath);
                 } else {
@@ -315,7 +317,7 @@ public class manageReports extends javax.swing.JFrame {
 
             int option = JOptionPane.showConfirmDialog(null, message, "Yearly Report", JOptionPane.OK_CANCEL_OPTION);
             if (option == JOptionPane.OK_OPTION) {
-                String filePath = adController.generateReport("yearly", selectedYear);
+                String filePath = reportGenerator.generateReport("yearly", selectedYear);
                 if (filePath != null && !filePath.isEmpty()) {
                     uf.displayReport(filePath);
                 } else {
@@ -347,7 +349,7 @@ public class manageReports extends javax.swing.JFrame {
                 if (selectedYear != null && selectedMonth != null && selectedDay != null) {
                     String date = selectedYear + "-" + selectedMonth + "-" + selectedDay;
 
-                    String filePath = adController.generateReport("daily", date);
+                    String filePath = reportGenerator.generateReport("daily", date);
                     if (filePath != null && !filePath.isEmpty()) {
                         uf.displayReport(filePath);
                     } else {

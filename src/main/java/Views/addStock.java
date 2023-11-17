@@ -4,25 +4,43 @@ package Views;/*
  */
 
 import Controllers.AdminController;
+import Helpers.CsvReader;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.File;
 import java.sql.SQLException;
 
-/**
- *
- * @author ShaafSalman
- */
-public class addStock extends javax.swing.JFrame {
-    AdminController adController = new AdminController();
 
-    /**
-     * Creates new form addStock
-     */
+public class addStock extends javax.swing.JFrame {
+    ///////////////////////////////////////////////////////////////////////////////////////
+    AdminController adController = new AdminController();
+    CsvReader csvReader = new CsvReader();
+
     public addStock() throws SQLException {
         initComponents();
     }
+    private void btnUploadActionPerformed(java.awt.event.ActionEvent evt) {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Choose CSV File");
+        fileChooser.setFileFilter(new FileNameExtensionFilter("CSV Files", "csv"));
+
+        int userSelection = fileChooser.showOpenDialog(this);
+
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            String FilePath = csvReader.processCSVFile(selectedFile);
+
+            // Show details from ProductLog.txt
+            csvReader.readProductLogFile(tblLogs,FilePath);
+            //txtStatus.setText(logDetails);
+            lblStatus.setText("Status: Successful");
+
+            // Update progress bar
+            progressBar.setValue(100); // Set progress to 100%
+        }
+    }
+    ///////////////////////////////////////////////////////////////////////////////////////
 
 
     @SuppressWarnings("unchecked")
@@ -150,28 +168,6 @@ public class addStock extends javax.swing.JFrame {
     }// </editor-fold>
 
 
-    ///////////////////////////////////////////////////////////////////////////////////////
-    private void btnUploadActionPerformed(java.awt.event.ActionEvent evt) {
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setDialogTitle("Choose CSV File");
-        fileChooser.setFileFilter(new FileNameExtensionFilter("CSV Files", "csv"));
-
-        int userSelection = fileChooser.showOpenDialog(this);
-
-        if (userSelection == JFileChooser.APPROVE_OPTION) {
-            File selectedFile = fileChooser.getSelectedFile();
-            String FilePath = adController.processCSVFile(selectedFile);
-
-            // Show details from ProductLog.txt
-            adController.readProductLogFile(tblLogs,FilePath);
-            //txtStatus.setText(logDetails);
-            lblStatus.setText("Status: Successful");
-
-            // Update progress bar
-            progressBar.setValue(100); // Set progress to 100%
-        }
-    }
-    ///////////////////////////////////////////////////////////////////////////////////////
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */

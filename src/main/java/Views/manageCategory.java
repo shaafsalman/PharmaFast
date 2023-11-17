@@ -4,6 +4,7 @@ package Views;/*
  */
 
 import Controllers.AdminController;
+import Models.Category;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -132,10 +133,6 @@ public class manageCategory extends javax.swing.JFrame {
         tblCategory.setFont(new java.awt.Font("Century Gothic", 1, 18)); // NOI18N
         tblCategory.setModel(new javax.swing.table.DefaultTableModel(
                 new Object [][] {
-                        {null, null, null},
-                        {null, null, null},
-                        {null, null, null},
-                        {null, null, null}
                 },
                 new String [] {
                         "Category ID", "Category Name", "Products"
@@ -190,8 +187,6 @@ public class manageCategory extends javax.swing.JFrame {
     }// </editor-fold>
 
 
-
-
     ///////////////////////////////////////////////////////////////////////////////////
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
@@ -200,14 +195,12 @@ public class manageCategory extends javax.swing.JFrame {
         String categoryName = JOptionPane.showInputDialog(this, "Enter Category Name:");
 
         if (categoryName != null && !categoryName.isEmpty()) {
-            boolean categoryAdded = adController.addCategory(categoryName);
+            Category newCategory = new Category(0, categoryName);
+            boolean categoryAdded = adController.addCategory(newCategory);
 
-            if (categoryAdded)
-            {
+            if (categoryAdded) {
                 JOptionPane.showMessageDialog(this, "Category added successfully!");
-            }
-            else
-            {
+            } else {
                 JOptionPane.showMessageDialog(this, "Error adding the category. Please try again.");
             }
 
@@ -215,57 +208,50 @@ public class manageCategory extends javax.swing.JFrame {
         }
     }
     private void btnModifyActionPerformed(java.awt.event.ActionEvent evt) {
-        // Get the selected row in the table
         int selectedRow = tblCategory.getSelectedRow();
 
-        // Check if a row is selected
         if (selectedRow == -1) {
             JOptionPane.showMessageDialog(this, "Please select a category to modify.");
             return;
         }
 
         int categoryID = 0;
-        categoryID =(int) tblCategory.getValueAt(selectedRow, 0);
+        categoryID = (int) tblCategory.getValueAt(selectedRow, 0);
         String currentName = (String) tblCategory.getValueAt(selectedRow, 1);
-
 
         String newName = JOptionPane.showInputDialog(this, "Enter a new name for the category:", currentName);
 
-        // Check if the user provided a new category name
         if (newName != null && !newName.isEmpty()) {
-            // Call the function to edit the category name in the database
-            boolean updated = adController.editCategoryName(categoryID, newName);
+            Category updatedCategory = new Category(categoryID, newName);
+            boolean updated = adController.editCategory(updatedCategory);
 
-            if (updated) {
-                // If the update was successful, update the table to reflect the changes
-                adController.initializeCategoryTable(tblCategory);
-            } else {
-                JOptionPane.showMessageDialog(this, "Failed to update the category name.");
-            }
-        }
-    }
-    private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {
-
-        int selectedRow = tblCategory.getSelectedRow();
-
-        if (selectedRow == -1) {
-            JOptionPane.showMessageDialog(this, "Please select a category to Delete.");
-            return;
-        }
-
-        int categoryID = 0;
-        String name =(String) tblCategory.getValueAt(selectedRow, 1);
-        categoryID =(int) tblCategory.getValueAt(selectedRow, 0);
-
-            if (adController.deleteCategory(categoryID))
+            if (updated)
             {
                 adController.initializeCategoryTable(tblCategory);
             }
             else
             {
-                JOptionPane.showMessageDialog(this, "Failed to Delete " + name +" " +categoryID);
+                JOptionPane.showMessageDialog(this, "Failed to update the category name.");
             }
+        }
+    }
+    private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {
+        int selectedRow = tblCategory.getSelectedRow();
 
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a category to delete.");
+            return;
+        }
+
+        int categoryID = 0;
+        String name = (String) tblCategory.getValueAt(selectedRow, 1);
+        categoryID = (int) tblCategory.getValueAt(selectedRow, 0);
+
+        if (adController.deleteCategory(categoryID)) {
+            adController.initializeCategoryTable(tblCategory);
+        } else {
+            JOptionPane.showMessageDialog(this, "Failed to delete " + name + " " + categoryID);
+        }
     }
     ///////////////////////////////////////////////////////////////////////////////////
 

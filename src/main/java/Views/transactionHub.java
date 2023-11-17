@@ -5,6 +5,7 @@ package Views;/*
 
 import Controllers.AdminController;
 import Controllers.CashierController;
+import Helpers.ReportGenerator;
 import Helpers.UtilityFunctions;
 
 import javax.swing.*;
@@ -13,10 +14,7 @@ import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *
@@ -31,6 +29,11 @@ public class transactionHub extends javax.swing.JFrame {
     CashierController csController = new CashierController();
     AdminController adController = new AdminController();
     UtilityFunctions uFunctions = new UtilityFunctions();
+
+    ReportGenerator reportGenerator = new ReportGenerator();
+
+
+
     public transactionHub() throws SQLException {
         initComponents();
        optimizTable(tblCart);
@@ -172,9 +175,12 @@ public class transactionHub extends javax.swing.JFrame {
         String change = txtChange.getText();
 
         // Calling the generateReport function passing the necessary parameters
-        String pdfFilePath = adController.generateRecipt(tblCart, total, subTotal, vat, paidAmount, change);
+        String pdfFilePath = reportGenerator.generateReceipt(tblCart, total, subTotal, vat, paidAmount, change);
         uFunctions.displayReport(pdfFilePath);
     }
+
+
+
     private void btnVoidF10ActionPerformed(java.awt.event.ActionEvent evt) {
         clearAll();
     }

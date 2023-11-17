@@ -6,6 +6,7 @@ package Views;
 
 import Controllers.AdminController;
 import Helpers.UtilityFunctions;
+import Models.Product;
 
 import javax.swing.*;
 import java.sql.SQLException;
@@ -24,14 +25,14 @@ public class manageProducts extends javax.swing.JFrame {
      * Creates new form manageProducts
      */
 
-    AdminController ad = new AdminController();
+    AdminController adController = new AdminController();
     UtilityFunctions uf = new UtilityFunctions();
 
     public manageProducts() throws SQLException 
     {
         initComponents();
-        ad.initializeProductsTable(tblProducts);
-        
+        adController.initializeProductsTable(tblProducts);
+
     }
 
 
@@ -131,12 +132,10 @@ public class manageProducts extends javax.swing.JFrame {
         tblProducts.setFont(new java.awt.Font("Century Gothic", 1, 18)); // NOI18N
         tblProducts.setModel(new javax.swing.table.DefaultTableModel(
                 new Object [][] {},
-                new String [] {
-                        "Poduct ID", "Category", "Product", "Cost Price", "Selling Price", "Quantity"
-                }
+                new String [] {"Product ID", "Category", "Product", "Cost Price", "Selling Price", "Quantity", "Expiry Date"}
         ) {
             Class[] types = new Class [] {
-                    java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.String.class, java.lang.Object.class, java.lang.Object.class
+                    java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.String.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -216,14 +215,17 @@ public class manageProducts extends javax.swing.JFrame {
         }
 
         int productID = 0;
-        String name = (String) tblProducts.getValueAt(selectedRow, 2);
-        productID = (int) tblProducts.getValueAt(selectedRow, 0);
 
-        // Gather existing values from the table
+        productID = (int) tblProducts.getValueAt(selectedRow, 0);
         String productName = (String) tblProducts.getValueAt(selectedRow, 2);
         double costPrice = (double) tblProducts.getValueAt(selectedRow, 3);
         double sellingPrice = (double) tblProducts.getValueAt(selectedRow, 4);
         int quantity = (int) tblProducts.getValueAt(selectedRow, 5);
+        String category = (String) tblProducts.getValueAt(selectedRow, 1);
+        int categoryID = adController.getCategoryIDByName(category);
+        java.sql.Date expiryDate = (java.sql.Date) tblProducts.getValueAt(selectedRow, 6);
+
+
 
         // Prompt the user to update values or skip
         String inputProductName = JOptionPane.showInputDialog(null, "Enter Product Name (Skip to keep existing):");
@@ -254,37 +256,18 @@ public class manageProducts extends javax.swing.JFrame {
             quantity = inputQuantity;
         }
 
-        // Pass these values to a function that updates the database
-        boolean updateResult = ad.updateProduct(productID, productName, costPrice, sellingPrice, quantity);
+        // Create a Product object with the updated values
+        Product updatedProduct = new Product(productID, productName, costPrice, sellingPrice, quantity,categoryID,expiryDate);
+
+        // Pass the Product object to a function that updates the database
+        boolean updateResult = adController.updateProduct(updatedProduct);
 
         if (updateResult) {
-            JOptionPane.showMessageDialog(this, "Product " + name + " (ID: " + productID + ") details updated successfully.");
+            JOptionPane.showMessageDialog(this, "Product " + productName + " (ID: " + productID + ") details updated successfully.");
             // Refresh the products table if update successful
-            ad.initializeProductsTable(tblProducts);
+            adController.initializeProductsTable(tblProducts);
         } else {
-            JOptionPane.showMessageDialog(this, "Failed to update product details for " + name + " (ID: " + productID + ")");
-        }
-    }
-    private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {
-        int selectedRow = tblProducts.getSelectedRow();
-
-        if (selectedRow == -1) {
-            JOptionPane.showMessageDialog(this, "Please select a category to Delete.");
-            return;
-        }
-
-        int productID = 0;
-        String name =(String) tblProducts.getValueAt(selectedRow, 2);
-        productID =(int) tblProducts.getValueAt(selectedRow, 0);
-
-        if (ad.deleteProduct(productID))
-        {
-            JOptionPane.showMessageDialog(this, "Product" + name + ": " +productID);
-            ad.initializeProductsTable(tblProducts);
-        }
-        else
-        {
-            JOptionPane.showMessageDialog(this, "Failed to Delete " + name +" " +productID);
+            JOptionPane.showMessageDialog(this, "Failed to update product details for " + productName + " (ID: " + productID + ")");
         }
     }
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {
@@ -294,7 +277,7 @@ public class manageProducts extends javax.swing.JFrame {
         int quantity = 0;
 
         Map<Integer, String> categoryData = new HashMap<>();
-        boolean success = ad.getCategoryData(categoryData);
+        boolean success = adController.getCategoryData(categoryData);
 
         if (!success) {
             JOptionPane.showMessageDialog(null, "Failed to retrieve category data. Please try again later.");
@@ -373,17 +356,41 @@ public class manageProducts extends javax.swing.JFrame {
             java.util.Date utilDate = dateFormat.parse(selectedExpiryDate);
             java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
 
-            boolean addResult = ad.addProduct(productName, costPrice, sellingPrice, quantity, categoryID, sqlDate);
+            Product newProduct = new Product(0, productName, costPrice, sellingPrice, quantity,categoryID,sqlDate);
+
+            boolean addResult = adController.addProduct(newProduct);
 
             if (addResult) {
                 JOptionPane.showMessageDialog(this, "Product " + productName + " added successfully.");
-                ad.initializeProductsTable(tblProducts);
+                adController.initializeProductsTable(tblProducts);
             } else {
                 JOptionPane.showMessageDialog(this, "Failed to add product " + productName);
             }
         } catch (ParseException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(null, "Error parsing the selected date.");
+        }
+    }
+    private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {
+        int selectedRow = tblProducts.getSelectedRow();
+
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a category to Delete.");
+            return;
+        }
+
+        int productID = 0;
+        String name =(String) tblProducts.getValueAt(selectedRow, 2);
+        productID =(int) tblProducts.getValueAt(selectedRow, 0);
+
+        if (adController.deleteProduct(productID))
+        {
+            JOptionPane.showMessageDialog(this, "Product" + name + ": " +productID);
+            adController.initializeProductsTable(tblProducts);
+        }
+        else
+        {
+            JOptionPane.showMessageDialog(this, "Failed to Delete " + name +" " +productID);
         }
     }
 //////////////////////////////////////////////////////////////////////////////////////////////
