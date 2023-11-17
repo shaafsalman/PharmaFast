@@ -1,8 +1,5 @@
 package Views;
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
+
 
 import Controllers.AdminController;
 import Helpers.UtilityFunctions;
@@ -28,7 +25,7 @@ public class manageProducts extends javax.swing.JFrame {
     AdminController adController = new AdminController();
     UtilityFunctions uf = new UtilityFunctions();
 
-    public manageProducts() throws SQLException 
+    public manageProducts() throws SQLException
     {
         initComponents();
         adController.initializeProductsTable(tblProducts);
@@ -202,9 +199,7 @@ public class manageProducts extends javax.swing.JFrame {
     JComboBox<String> yearComboBox = uf.createExpiryYearComboBox();
     JComboBox<String> monthComboBox = uf.createMonthComboBox();
     JComboBox<String> dayComboBox = uf.createDayComboBox();
-    //////////////////////////////////////////////////////////////////////////////////////////////
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
     }
     private void btnModifyActionPerformed(java.awt.event.ActionEvent evt) {
         int selectedRow = tblProducts.getSelectedRow();
@@ -226,14 +221,11 @@ public class manageProducts extends javax.swing.JFrame {
         java.sql.Date expiryDate = (java.sql.Date) tblProducts.getValueAt(selectedRow, 6);
 
 
-
-        // Prompt the user to update values or skip
         String inputProductName = JOptionPane.showInputDialog(null, "Enter Product Name (Skip to keep existing):");
         double inputCostPrice;
         double inputSellingPrice;
         int inputQuantity;
 
-        // Check if the user skipped the input for each value
         if (inputProductName != null && !inputProductName.isEmpty()) {
             productName = inputProductName;
         }
@@ -256,15 +248,12 @@ public class manageProducts extends javax.swing.JFrame {
             quantity = inputQuantity;
         }
 
-        // Create a Product object with the updated values
         Product updatedProduct = new Product(productID, productName, costPrice, sellingPrice, quantity,categoryID,expiryDate);
 
-        // Pass the Product object to a function that updates the database
         boolean updateResult = adController.updateProduct(updatedProduct);
 
         if (updateResult) {
             JOptionPane.showMessageDialog(this, "Product " + productName + " (ID: " + productID + ") details updated successfully.");
-            // Refresh the products table if update successful
             adController.initializeProductsTable(tblProducts);
         } else {
             JOptionPane.showMessageDialog(this, "Failed to update product details for " + productName + " (ID: " + productID + ")");
@@ -393,7 +382,6 @@ public class manageProducts extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Failed to Delete " + name +" " +productID);
         }
     }
-//////////////////////////////////////////////////////////////////////////////////////////////
 
 
 
@@ -415,9 +403,7 @@ public class manageProducts extends javax.swing.JFrame {
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(manageProducts.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
 
-        /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
@@ -429,7 +415,6 @@ public class manageProducts extends javax.swing.JFrame {
         });
     }
 
-    // Variables declaration - do not modify
     private javax.swing.JButton btnAdd;
     private javax.swing.JButton btnBack;
     private javax.swing.JButton btnDelete;
@@ -441,5 +426,5 @@ public class manageProducts extends javax.swing.JFrame {
     private javax.swing.JLabel picUser;
     private javax.swing.JPanel pnlTittle;
     private javax.swing.JTable tblProducts;
-    // End of variables declaration
+
 }

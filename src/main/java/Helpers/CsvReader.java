@@ -109,7 +109,7 @@ public class CsvReader
             return new java.sql.Date(utilDate.getTime());
         } catch (ParseException e) {
             e.printStackTrace();
-            return null; // or handle the parsing error as needed in your application
+            return null;
         }
     }
     private String createLogFilePath() {
@@ -129,11 +129,10 @@ public class CsvReader
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
             while ((line = br.readLine()) != null) {
-                model.addRow(new Object[]{line}); // Add a row to the table
+                model.addRow(new Object[]{line});
             }
         } catch (IOException e) {
             e.printStackTrace();
-            // Log an error message in case reading the file fails
             model.addRow(new Object[]{"Error reading " + filePath + ": " + e.getMessage()});
         }
 
@@ -141,7 +140,7 @@ public class CsvReader
 
         class HeaderRenderer extends DefaultTableCellRenderer {
             public HeaderRenderer() {
-                setHorizontalAlignment(SwingConstants.CENTER); // Center-align the text
+                setHorizontalAlignment(SwingConstants.CENTER);
             }
         }
         table.setFont(new Font("Century Gothic", Font.PLAIN, 14));
@@ -162,7 +161,6 @@ public class CsvReader
 
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
-        //table.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
     }
 
 }

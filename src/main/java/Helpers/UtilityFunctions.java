@@ -41,7 +41,6 @@ public class UtilityFunctions {
     public JComboBox<String> createMonthComboBox() {
         JComboBox<String> monthComboBox = new JComboBox<>();
 
-        // Populate the months (1 to 12)
         for (int i = 1; i <= 12; i++) {
             monthComboBox.addItem(String.format("%02d", i));
         }
@@ -70,7 +69,6 @@ public class UtilityFunctions {
                 return false;
             }
 
-            // Use Calendar to check for specific month lengths (considering leap years for February)
             Calendar calendar = Calendar.getInstance();
             calendar.setLenient(false);
             calendar.set(Calendar.YEAR, year);
@@ -88,18 +86,15 @@ public class UtilityFunctions {
             File reportFile = new File(filePath);
 
             if (reportFile.exists()) {
-                // If the file exists, you can open it or perform any action here
                 try {
-                    Desktop.getDesktop().open(reportFile); // Opens the file using the system default application
+                    Desktop.getDesktop().open(reportFile);
                 } catch (IOException e) {
-                    e.printStackTrace(); // Handle the error if the file cannot be opened
+                    e.printStackTrace();
                 }
             } else {
-                // Handle case where the file does not exist
                 JOptionPane.showMessageDialog(null, "The generated report file does not exist.");
             }
         } else {
-            // Handle case where the file path is empty or null
             JOptionPane.showMessageDialog(null, "No report file generated.");
         }
     }
@@ -108,7 +103,6 @@ public class UtilityFunctions {
         String filePath = "src/main/resources/StockRequests";
         File fileDirectory = new File(filePath);
 
-        // Create the directory if it doesn't exist
         if (!fileDirectory.exists()) {
             fileDirectory.mkdirs();
         }

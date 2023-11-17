@@ -8,8 +8,8 @@ import java.sql.*;
 
 public class CashierController{
 
-        ProductDao productDao = new ProductDao();
-        public static float vat = 5.0F;
+    ProductDao productDao = new ProductDao();
+    public static float vat = 5.0F;
 
 
     public boolean productExists(String productID) {return productDao.productExists(productID);}
@@ -20,6 +20,6 @@ public class CashierController{
         return productDao.getPrice(productID);
     }
     public int getAvailableQuantity(String productID) {
-       return productDao.getAvailableQuantity(productID);
+        return productDao.getAvailableQuantity(productID);
     }
 }

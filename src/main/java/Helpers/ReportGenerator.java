@@ -34,20 +34,18 @@ public class ReportGenerator {
             PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(pdfOutputFile));
             document.open();
 
-            // Add logo
             Image logo = Image.getInstance("src/main/resources/Material/apple-touch-icon.png");
             logo.setAlignment(Element.ALIGN_CENTER);
             logo.scaleAbsolute(45, 45);
             document.add(logo);
 
-            // Header
             Paragraph header = new Paragraph("PharmaFast - " + reportType + " Report - " + date + "\n\n",
                     FontFactory.getFont("Century Gothic", 18, BaseColor.BLACK));
             header.setAlignment(Element.ALIGN_CENTER);
             document.add(header);
 
-            // SQL details in table format
-            PdfPTable table = new PdfPTable(4); // Change the number of columns to 4
+
+            PdfPTable table = new PdfPTable(4);
             table.setWidthPercentage(100);
             table.addCell(getHeaderCell("Transaction ID"));
             table.addCell(getHeaderCell("UserID"));
@@ -109,7 +107,6 @@ public class ReportGenerator {
 
             document.add(table);
 
-            // Footer with date
             Paragraph footer = new Paragraph("Report generated on: " + LocalDate.now(),
                     FontFactory.getFont("Century Gothic", 12, BaseColor.BLACK));
             footer.setAlignment(Element.ALIGN_RIGHT);
@@ -142,23 +139,19 @@ public class ReportGenerator {
             PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(pdfOutputFile));
             document.open();
 
-            // Add logo
             Image logo = Image.getInstance("src/main/resources/Material/apple-touch-icon.png");
             logo.setAlignment(Element.ALIGN_CENTER);
             logo.scaleAbsolute(45, 45);
             document.add(logo);
 
-            // Header with Title
             Paragraph title = new Paragraph("PharmaFast - Recipt\n\n",
                     FontFactory.getFont("Century Gothic", 18, BaseColor.BLACK));
             title.setAlignment(Element.ALIGN_CENTER);
             document.add(title);
 
-            // Add Table Contents
             PdfPTable cartTable = new PdfPTable(6); // Change the number of columns based on your cart table
             cartTable.setWidthPercentage(100);
 
-            // Add Table Headers
             cartTable.addCell(getHeaderCell("Product ID"));
             cartTable.addCell(getHeaderCell("Product Name"));
             cartTable.addCell(getHeaderCell("Category"));
@@ -166,7 +159,6 @@ public class ReportGenerator {
             cartTable.addCell(getHeaderCell("Quantity"));
             cartTable.addCell(getHeaderCell("Total Price"));
 
-            // Fetch cart details from JTable
             DefaultTableModel model = (DefaultTableModel) tableCart.getModel();
             for (int i = 0; i < model.getRowCount(); i++) {
                 cartTable.addCell(getCell(model.getValueAt(i, 0).toString())); // Product ID
@@ -179,7 +171,6 @@ public class ReportGenerator {
 
             document.add(cartTable);
 
-            // Other Details
 
             Paragraph totalParagraph = new Paragraph("Total: " + total);
             totalParagraph.setAlignment(Element.ALIGN_RIGHT);
@@ -201,8 +192,6 @@ public class ReportGenerator {
             changeParagraph.setAlignment(Element.ALIGN_RIGHT);
             document.add(changeParagraph);
 
-
-            // Footer with date
             Paragraph footer = new Paragraph("\n\n\nReport generated on: " + LocalDate.now(),
                     FontFactory.getFont("Century Gothic", 12, BaseColor.BLACK));
             footer.setAlignment(Element.ALIGN_CENTER);

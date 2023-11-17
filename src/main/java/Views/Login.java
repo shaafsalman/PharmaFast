@@ -8,7 +8,6 @@ public class Login extends javax.swing.JFrame {
     }
 
     @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">
     private void initComponents() {
 
         pnlBack = new javax.swing.JPanel();
@@ -149,12 +148,11 @@ public class Login extends javax.swing.JFrame {
                 btnRegisterActionPerformed(evt);
             }
         });
-    }// </editor-fold>
+    }
 
 
 
     private void btnRegisterActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
 
         Sighnup newForm = new Sighnup();
         newForm.setVisible(true);
@@ -169,7 +167,6 @@ public class Login extends javax.swing.JFrame {
         });
     }
 
-    // Variables declaration - do not modify
     private javax.swing.JToggleButton btnLogin;
     private javax.swing.JToggleButton btnRegister;
     private javax.swing.JLabel doodle;
@@ -180,5 +177,4 @@ public class Login extends javax.swing.JFrame {
     private javax.swing.JPanel pnlFront;
     private javax.swing.JTextField txtPassword;
     private javax.swing.JTextField txtUsername;
-    // End of variables declaration
 }

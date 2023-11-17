@@ -1,7 +1,4 @@
-package Views;/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
+package Views;
 import Controllers.AdminController;
 
 import javax.swing.*;
@@ -22,10 +19,8 @@ import java.util.HashMap;
 public class ManagerDashboard extends javax.swing.JFrame {
 
 
-AdminController adController = new AdminController();
-    /**
-     * Creates new form Controllers.ManagerHub
-     */
+    AdminController adController = new AdminController();
+
     public ManagerDashboard() throws SQLException {
         initComponents();
     }
@@ -306,40 +301,36 @@ AdminController adController = new AdminController();
 
 
     private void btnEditUserDetailsActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
+
     }
 
     private void btnViewProductsActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
+
     }
 
     private void btnManageExpiredInventoryActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
     }
 
     private void btnAddNewStockActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
     }
 
     private void btnGenerateInentoryReportActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
+
     }
 
     private void btnManageSalesReportActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
+
     }
 
     private void btnManageCategoriesActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
+
     }
 
     private void btnLogOutActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
+
     }
 
-    /**
-     * @param args the command line arguments
-     */
+
     public static void main(String args[]) {
 
         try {
@@ -358,9 +349,7 @@ AdminController adController = new AdminController();
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(ManagerDashboard.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
 
-        /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
@@ -372,7 +361,6 @@ AdminController adController = new AdminController();
         });
     }
 
-    // Variables declaration - do not modify
     private javax.swing.JButton btnAddNewStock;
     private javax.swing.JButton btnEditUserDetails;
     private javax.swing.JButton btnGenerateInentoryReport;
@@ -392,5 +380,5 @@ AdminController adController = new AdminController();
     private javax.swing.JPanel pnlSide;
     private javax.swing.JPanel pnlUser;
     private javax.swing.JPanel pnlWhiteMain;
-    // End of variables declaration
+
 }

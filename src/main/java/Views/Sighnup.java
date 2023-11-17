@@ -206,34 +206,26 @@ public class Sighnup<Signup> extends javax.swing.JFrame {
 
 
         try {
-            // Establish a database connection with Windows Authentication
             Connection conn = DriverManager.getConnection(ConnectionFile.dbURL, ConnectionFile.DBusername, ConnectionFile.DBpassword);
 
-            // Create an SQL INSERT statement with placeholders
             String insertSQL = "INSERT INTO Users (Username, Password, Role) VALUES (?, ?, ?)";
             PreparedStatement preparedStatement = conn.prepareStatement(insertSQL);
 
-            // Set values for the placeholders
             preparedStatement.setString(1, newUsername);
             preparedStatement.setString(2, newPassword);
             preparedStatement.setString(3, newRole);
 
-            // Execute the INSERT statement
             int rowsAffected = preparedStatement.executeUpdate();
 
             if (rowsAffected > 0)
             {
                 JOptionPane.showMessageDialog(this,"User registered successfully");
-                //System.out.println("");
             } else {
                 JOptionPane.showMessageDialog(this,"User registered UNsuccessfully");
-                //System.out.println("User registration failed");
             }
 
-            // Close the database connection
             conn.close();
         } catch (SQLException e) {
-            // Handle database connection or SQL errors
             e.printStackTrace();
 
         }
@@ -249,7 +241,6 @@ public class Sighnup<Signup> extends javax.swing.JFrame {
         });
     }
 
-    // Variables declaration - do not modify
     private javax.swing.JToggleButton btnLogin;
     private javax.swing.JToggleButton btnRegister;
     private javax.swing.JComboBox<String> cmboRole;
@@ -262,5 +253,4 @@ public class Sighnup<Signup> extends javax.swing.JFrame {
     private javax.swing.JTextField txtAdminCode;
     private javax.swing.JTextField txtPassword;
     private javax.swing.JTextField txtUsername;
-    // End of variables declaration
 }

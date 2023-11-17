@@ -26,8 +26,8 @@ public class ProductDao {
             preparedStatement.setDouble(2, product.getCostPrice());
             preparedStatement.setDouble(3, product.getSellingPrice());
             preparedStatement.setInt(4, product.getQuantity());
-            preparedStatement.setInt(5, product.getCategoryID()); // Assuming you have a method getCategoryID() in the Product class
-            preparedStatement.setDate(6, product.getExpiryDate()); // Assuming you have a method getExpiryDate() in the Product class
+            preparedStatement.setInt(5, product.getCategoryID());
+            preparedStatement.setDate(6, product.getExpiryDate());
 
             int rowsAffected = preparedStatement.executeUpdate();
 
@@ -45,7 +45,7 @@ public class ProductDao {
             preparedStatement.setDouble(2, product.getCostPrice());
             preparedStatement.setDouble(3, product.getSellingPrice());
             preparedStatement.setInt(4, product.getQuantity());
-            preparedStatement.setInt(5, product.getProductID()); // Assuming you have a method getProductID() in the Product class
+            preparedStatement.setInt(5, product.getProductID());
 
             int rowsAffected = preparedStatement.executeUpdate();
 
@@ -78,10 +78,10 @@ public class ProductDao {
         return preparedStatement.executeQuery();
     }
     public int getProductID(String productName, Date expiryDate) {
-        int productID = -1; // Assuming -1 indicates no product found
+        int productID = -1;
 
-        try {
-            // Establish the database connection (Assuming 'connection' is an existing connection)
+        try
+        {
             String query = "SELECT productID FROM Products WHERE productName = ? AND expiryDate = ?";
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setString(1, productName);
@@ -93,12 +93,10 @@ public class ProductDao {
                 productID = resultSet.getInt("productID");
             }
 
-            // Close the connections
             resultSet.close();
             statement.close();
         } catch (SQLException e) {
             e.printStackTrace();
-            // Handle the SQL exception
         }
 
         return productID;
@@ -109,7 +107,6 @@ public class ProductDao {
             PreparedStatement selectStatement = connection.prepareStatement(selectQuery);
             selectStatement.setInt(1, productID);
 
-            // Execute the select query to get the current quantity
             ResultSet resultSet = selectStatement.executeQuery();
 
             int currentQuantity = 0;
@@ -119,25 +116,21 @@ public class ProductDao {
 
             int totalQuantity = currentQuantity + newQuantity;
 
-            // Update the database with the total quantity
             String updateQuery = "UPDATE Products SET Quantity = ? WHERE ProductID = ?";
             PreparedStatement updateStatement = connection.prepareStatement(updateQuery);
             updateStatement.setInt(1, totalQuantity);
             updateStatement.setInt(2, productID);
 
-            // Execute the update query
             int rowsUpdated = updateStatement.executeUpdate();
 
-            // Close the database resources
             resultSet.close();
             selectStatement.close();
             updateStatement.close();
 
-            return rowsUpdated > 0; // Return true if rows were updated
+            return rowsUpdated > 0;
         } catch (SQLException e) {
             e.printStackTrace();
-            // Handle the SQL exception
-            return false; // Return false for an error
+            return false;
         }
     }
     public ResultSet getProductsTotalQuantityGreaterThanZero() throws SQLException {
