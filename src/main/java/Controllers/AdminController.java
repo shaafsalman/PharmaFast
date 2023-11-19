@@ -30,18 +30,24 @@ import java.util.Map;
 
 public class AdminController {
 
-    private final CategoryDao categoryDao;
-    private final ProductDao productDao;
-    private final UtilityFunctions uFunctions;
+    private  CategoryDao categoryDao;
+    private  ProductDao productDao;
+    private  UtilityFunctions uFunctions;
 
 
 
     public AdminController() throws SQLException
     {
         this.categoryDao = new CategoryDao();
-        this.uFunctions = new UtilityFunctions();
         this.productDao = new ProductDao();
+        this.uFunctions = new UtilityFunctions();
+    }
 
+    public AdminController(CategoryDao categoryDao, ProductDao productDao)
+    {
+        this.categoryDao = categoryDao;
+        this.productDao = productDao;
+        this.uFunctions = new UtilityFunctions();
     }
 
     public boolean addCategory(Category newCategory) {

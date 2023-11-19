@@ -10,6 +10,10 @@ public class CashierController {
     public CashierController() {
         this.productDao = new ProductDao();
     }
+    public CashierController(ProductDao productDao) {
+        this.productDao = productDao;
+    }
+
 
     public boolean productExists(String productID) {
         if (!isValidProductId(productID)) {

@@ -29,7 +29,4 @@ public class Category {
     public static void addCategory(Category category) {
         categories.add(category);
     }
-
-
-
 }

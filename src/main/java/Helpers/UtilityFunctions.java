@@ -121,7 +121,6 @@ public class UtilityFunctions {
         }
         return false;
     }
-
     public static void initializeUForTable(JTable table) {
 
 
@@ -156,6 +155,5 @@ public class UtilityFunctions {
         table.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
 
     }
-
 
 }
