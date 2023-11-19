@@ -147,9 +147,9 @@ public class transactionHub extends javax.swing.JFrame {
         txtSubTotal.setText(String.valueOf(subtotal));
 
 
-        txtVat.setText(String.valueOf(csController.vat));
+        txtVat.setText(String.valueOf(csController.VAT));
 
-        float total = subtotal+((csController.vat/100) * subtotal);
+        float total = subtotal+((csController.VAT/100) * subtotal);
         txtTotalAmount.setText(String.valueOf(total));
 
     }
