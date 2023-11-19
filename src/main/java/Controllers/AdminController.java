@@ -2,6 +2,7 @@ package Controllers;
 
 import Dao.CategoryDao;
 import Dao.ProductDao;
+import Helpers.AdminConfig;
 import Helpers.ConnectionFile;
 import Helpers.UtilityFunctions;
 import Models.Category;
@@ -33,6 +34,42 @@ public class AdminController {
     private  CategoryDao categoryDao;
     private  ProductDao productDao;
     private  UtilityFunctions uFunctions;
+    private static final String CONFIG_FILE = "adminConfig.ser";
+    private static AdminConfig adminConfig = new AdminConfig(5.0f, 1122); // Default values
+
+    public static void saveConfig() {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(CONFIG_FILE))) {
+            oos.writeObject(adminConfig);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void loadConfig() {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(CONFIG_FILE))) {
+            adminConfig = (AdminConfig) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void setVatRate(float newVatRate) {
+        adminConfig.setVatRate(newVatRate);
+        saveConfig(); // Save changes
+    }
+
+    public static float getVatRate() {
+        return adminConfig.getVatRate();
+    }
+
+    public static void setAdminCode(int newAdminCode) {
+        adminConfig.setAdminCode(newAdminCode);
+        saveConfig(); // Save changes
+    }
+
+    public static int getAdminCode() {
+        return adminConfig.getAdminCode();
+    }
 
 
 
@@ -49,6 +86,9 @@ public class AdminController {
         this.productDao = productDao;
         this.uFunctions = new UtilityFunctions();
     }
+
+
+
 
     public boolean addCategory(Category newCategory) {
         if (newCategory.getCategoryName() == null || newCategory.getCategoryName().trim().isEmpty()) {

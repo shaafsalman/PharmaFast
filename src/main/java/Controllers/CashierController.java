@@ -5,15 +5,17 @@ import Dao.ProductDao;
 public class CashierController {
 
     private final ProductDao productDao;
-    public  final float VAT = 5.0F;
+    public final float VAT;
 
     public CashierController() {
         this.productDao = new ProductDao();
-    }
-    public CashierController(ProductDao productDao) {
-        this.productDao = productDao;
+        this.VAT = AdminController.getVatRate();
     }
 
+    public CashierController(ProductDao productDao) {
+        this.productDao = productDao;
+        this.VAT = AdminController.getVatRate();
+    }
 
     public boolean productExists(String productID) {
         if (!isValidProductId(productID)) {
