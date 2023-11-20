@@ -68,6 +68,51 @@ public class ProductDao {
             return false;
         }
     }
+
+    public String getProductName(String productID) {
+        String query = "SELECT ProductName FROM Products WHERE ProductID = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, productID);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getString("ProductName");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+    public String getCategoryName(String productID) {
+        String query = "SELECT CategoryName FROM Categories " +
+                "INNER JOIN Products ON Categories.CategoryID = Products.CategoryID " +
+                "WHERE ProductID = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, productID);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getString("CategoryName");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+    public double getPrice(String productID) {
+        String query = "SELECT Price FROM Products WHERE ProductID = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, productID);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getDouble("Price");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0.0;
+    }
     public ResultSet getAllProductData() throws SQLException {
         String query = "SELECT Products.ProductID, Categories.CategoryName, Products.ProductName, " +
                 "Products.Price, Products.SellingPrice, Products.Quantity, Products.ExpiryDate " +
@@ -182,50 +227,7 @@ public class ProductDao {
         }
         return false;
     }
-    public String getProductName(String productID) {
-        String query = "SELECT ProductName FROM Products WHERE ProductID = ?";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setString(1, productID);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    return resultSet.getString("ProductName");
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return "";
-    }
-    public String getCategoryName(String productID) {
-        String query = "SELECT CategoryName FROM Categories " +
-                "INNER JOIN Products ON Categories.CategoryID = Products.CategoryID " +
-                "WHERE ProductID = ?";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setString(1, productID);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    return resultSet.getString("CategoryName");
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return "";
-    }
-    public double getPrice(String productID) {
-        String query = "SELECT Price FROM Products WHERE ProductID = ?";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setString(1, productID);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    return resultSet.getDouble("Price");
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return 0.0;
-    }
+
     public int getAvailableQuantity(String productID) {
         String query = "SELECT Quantity FROM Products WHERE ProductID = ?";
         int availableQuantity = 0;

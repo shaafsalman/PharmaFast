@@ -4,7 +4,6 @@ import Controllers.AdminController;
 import Controllers.CashierController;
 import Helpers.ReportGenerator;
 import Helpers.UtilityFunctions;
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.*;
@@ -165,9 +164,6 @@ public class transactionHub extends javax.swing.JFrame {
         String pdfFilePath = reportGenerator.generateReceipt(tblCart, total, subTotal, vat, paidAmount, change);
         uFunctions.displayReport(pdfFilePath);
     }
-
-
-
     private void btnVoidF10ActionPerformed(java.awt.event.ActionEvent evt) {
         clearAll();
     }

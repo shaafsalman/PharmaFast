@@ -16,6 +16,27 @@ import java.time.LocalDate;
 import java.util.Calendar;
 
 public class UtilityFunctions {
+
+    public JComboBox<String> createDayComboBox() {
+        JComboBox<String> dayComboBox = new JComboBox<>();
+
+        for (int i = 1; i <= 31; i++) {
+            dayComboBox.addItem(String.format("%02d", i));
+        }
+
+        return dayComboBox;
+    }
+
+    public JComboBox<String> createMonthComboBox() {
+        JComboBox<String> monthComboBox = new JComboBox<>();
+
+        for (int i = 1; i <= 12; i++) {
+            monthComboBox.addItem(String.format("%02d", i));
+        }
+
+        return monthComboBox;
+    }
+
     public JComboBox<String> createYearComboBox() {
         JComboBox<String> yearComboBox = new JComboBox<>();
 
@@ -27,6 +48,8 @@ public class UtilityFunctions {
 
         return yearComboBox;
     }
+
+
     public JComboBox<String> createExpiryYearComboBox() {
         JComboBox<String> yearComboBox = new JComboBox<>();
 
@@ -37,24 +60,6 @@ public class UtilityFunctions {
         }
 
         return yearComboBox;
-    }
-    public JComboBox<String> createMonthComboBox() {
-        JComboBox<String> monthComboBox = new JComboBox<>();
-
-        for (int i = 1; i <= 12; i++) {
-            monthComboBox.addItem(String.format("%02d", i));
-        }
-
-        return monthComboBox;
-    }
-    public JComboBox<String> createDayComboBox() {
-        JComboBox<String> dayComboBox = new JComboBox<>();
-
-        for (int i = 1; i <= 31; i++) {
-            dayComboBox.addItem(String.format("%02d", i));
-        }
-
-        return dayComboBox;
     }
     public static boolean isValidDate(int year, int month, int day) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");

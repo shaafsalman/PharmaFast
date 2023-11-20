@@ -251,7 +251,6 @@ public class manageCategory extends javax.swing.JFrame {
 
 
 
-
     public static void main(String args[]) {
 
 

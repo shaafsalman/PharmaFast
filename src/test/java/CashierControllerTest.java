@@ -22,33 +22,6 @@ class CashierControllerTest {
     }
 
     @Test
-    void productExistsValid() {
-        when(productDao.productExists("123")).thenReturn(true);
-        assertTrue(cashierController.productExists("123"));
-    }
-
-    @Test
-    void productExistsInvalid() {
-        assertFalse(cashierController.productExists(""));
-    }
-
-    @Test
-    void isQuantityAvailableValid() {
-        when(productDao.isQuantityAvailable("123", 10)).thenReturn(true);
-        assertTrue(cashierController.isQuantityAvailable("123", 10));
-    }
-
-    @Test
-    void isQuantityAvailableInvalidProductId() {
-        assertFalse(cashierController.isQuantityAvailable("", 10));
-    }
-
-    @Test
-    void isQuantityAvailableNegativeQuantity() {
-        assertFalse(cashierController.isQuantityAvailable("123", -1));
-    }
-
-    @Test
     void getProductNameValid() {
         when(productDao.getProductName("123")).thenReturn("Product Name");
         assertEquals("Product Name", cashierController.getProductName("123"));
@@ -91,4 +64,33 @@ class CashierControllerTest {
     void getAvailableQuantityInvalid() {
         assertEquals(0, cashierController.getAvailableQuantity(""));
     }
+
+    @Test
+    void productExistsValid() {
+        when(productDao.productExists("123")).thenReturn(true);
+        assertTrue(cashierController.productExists("123"));
+    }
+
+    @Test
+    void productExistsInvalid() {
+        assertFalse(cashierController.productExists(""));
+    }
+
+    @Test
+    void isQuantityAvailableValid() {
+        when(productDao.isQuantityAvailable("123", 10)).thenReturn(true);
+        assertTrue(cashierController.isQuantityAvailable("123", 10));
+    }
+
+    @Test
+    void isQuantityAvailableInvalidProductId() {
+        assertFalse(cashierController.isQuantityAvailable("", 10));
+    }
+
+    @Test
+    void isQuantityAvailableNegativeQuantity() {
+        assertFalse(cashierController.isQuantityAvailable("123", -1));
+    }
+
+
 }

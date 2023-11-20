@@ -1,5 +1,4 @@
 package Controllers;
-
 import Dao.CategoryDao;
 import Dao.ProductDao;
 import Helpers.AdminConfig;
@@ -12,7 +11,6 @@ import com.itextpdf.text.Image;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -35,7 +33,7 @@ public class AdminController {
     private  ProductDao productDao;
     private  UtilityFunctions uFunctions;
     private static final String CONFIG_FILE = "adminConfig.ser";
-    private static AdminConfig adminConfig = new AdminConfig(5.0f, 1122); // Default values
+    private static AdminConfig adminConfig = new AdminConfig(5.0f, 1122);
 
     public static void saveConfig() {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(CONFIG_FILE))) {
@@ -53,25 +51,21 @@ public class AdminController {
         }
     }
 
-    public static void setVatRate(float newVatRate) {
-        adminConfig.setVatRate(newVatRate);
-        saveConfig(); // Save changes
-    }
-
     public static float getVatRate() {
         return adminConfig.getVatRate();
     }
-
-    public static void setAdminCode(int newAdminCode) {
-        adminConfig.setAdminCode(newAdminCode);
-        saveConfig(); // Save changes
+    public static void setVatRate(float newVatRate) {
+        adminConfig.setVatRate(newVatRate);
+        saveConfig();
     }
 
     public static int getAdminCode() {
         return adminConfig.getAdminCode();
     }
-
-
+    public static void setAdminCode(int newAdminCode) {
+        adminConfig.setAdminCode(newAdminCode);
+        saveConfig();
+    }
 
     public AdminController() throws SQLException
     {
@@ -87,9 +81,12 @@ public class AdminController {
         this.uFunctions = new UtilityFunctions();
     }
 
-
-
-
+    public boolean getCategoryData(Map<Integer, String> categoryData) {
+        return categoryDao.getCategoryData(categoryData);
+    }
+    public int getCategoryIDByName(String name) {
+        return categoryDao.getCategoryIDByName(name);
+    }
     public boolean addCategory(Category newCategory) {
         if (newCategory.getCategoryName() == null || newCategory.getCategoryName().trim().isEmpty()) {
             JOptionPane.showMessageDialog(null, "Category name cannot be empty.");
@@ -107,13 +104,6 @@ public class AdminController {
     public boolean deleteCategory(int categoryID) {
         return categoryDao.deleteCategory(categoryID);
     }
-    public boolean getCategoryData(Map<Integer, String> categoryData) {
-        return categoryDao.getCategoryData(categoryData);
-    }
-    public int getCategoryIDByName(String name) {
-        return categoryDao.getCategoryIDByName(name);
-    }
-
 
 
 
@@ -130,6 +120,7 @@ public class AdminController {
         }
         return productDao.updateProduct(product);
     }
+
     public boolean deleteProduct(int productId) {
         return productDao.deleteProduct(productId);
     }
@@ -149,10 +140,7 @@ public class AdminController {
         return true;
     }
 
-
-
-
-
+    //Initialising Tables
     public void initializeStockTable(JTable table) {
         DefaultTableModel model = (DefaultTableModel) table.getModel();
         model.setRowCount(0);
@@ -170,7 +158,6 @@ public class AdminController {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
 
         table.setModel(model);
         uFunctions.initializeUForTable(table);

@@ -45,12 +45,12 @@ public class Product {
         return categoryID;
     }
 
-    public Date getExpiryDate() {
-        return expiryDate;
-    }
-
     public void setCategoryID(int categoryID) {
         this.categoryID = categoryID;
+    }
+
+    public Date getExpiryDate() {
+        return expiryDate;
     }
 
     public void setExpiryDate(Date expiryDate) {

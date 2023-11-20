@@ -118,15 +118,16 @@ public class ReportGenerator {
         }
         return pdfOutputFile;
     }
-    private static PdfPCell getCell(String content) {
-        PdfPCell cell = new PdfPCell(new Phrase(content, FontFactory.getFont("Century Gothic", 12, BaseColor.BLACK)));
-        cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-        return cell;
-    }
+
     private static PdfPCell getHeaderCell(String content) {
         com.itextpdf.text.Font font = FontFactory.getFont("Century Gothic", 14, BaseColor.WHITE);
         PdfPCell cell = new PdfPCell(new Phrase(content, font));
         cell.setBackgroundColor(BaseColor.DARK_GRAY);
+        cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        return cell;
+    }
+    private static PdfPCell getCell(String content) {
+        PdfPCell cell = new PdfPCell(new Phrase(content, FontFactory.getFont("Century Gothic", 12, BaseColor.BLACK)));
         cell.setHorizontalAlignment(Element.ALIGN_CENTER);
         return cell;
     }

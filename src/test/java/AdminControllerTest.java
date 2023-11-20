@@ -31,6 +31,20 @@ class AdminControllerTest {
     }
 
     @Test
+    void addValidProduct() {
+        Product product = new Product(1, "Laptop", 500.0, 700.0, 10, 1, null);
+        when(productDao.addProduct(any(Product.class))).thenReturn(true);
+
+        assertTrue(adminController.addProduct(product));
+        verify(productDao, times(1)).addProduct(product);
+    }
+
+    @Test
+    void addInvalidProduct() {
+        Product product = new Product(1, "Laptop", 700.0, 500.0, 10, 1, null);
+        assertFalse(adminController.addProduct(product));
+    }
+    @Test
     void addValidCategory() {
         Category category = new Category(1, "Electronics");
         when(categoryDao.addCategory(anyString())).thenReturn(true);
@@ -69,20 +83,7 @@ class AdminControllerTest {
         verify(categoryDao, times(1)).deleteCategory(categoryId);
     }
 
-    @Test
-    void addValidProduct() {
-        Product product = new Product(1, "Laptop", 500.0, 700.0, 10, 1, null);
-        when(productDao.addProduct(any(Product.class))).thenReturn(true);
 
-        assertTrue(adminController.addProduct(product));
-        verify(productDao, times(1)).addProduct(product);
-    }
-
-    @Test
-    void addInvalidProduct() {
-        Product product = new Product(1, "Laptop", 700.0, 500.0, 10, 1, null);
-        assertFalse(adminController.addProduct(product));
-    }
 
     @Test
     void updateValidProduct() {
