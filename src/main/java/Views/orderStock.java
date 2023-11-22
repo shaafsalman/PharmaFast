@@ -13,14 +13,14 @@ import java.sql.SQLException;
  */
 public class orderStock extends javax.swing.JFrame {
 
-    AdminController adController = new AdminController();
+    AdminController adminController = new AdminController();
     UtilityFunctions uFunctions = new UtilityFunctions();
 
     public orderStock() throws SQLException {
 
         initComponents();
-        adController.initializeStockTable(tblStock);
-        adController.initializeDeadStockTable(tblDeadStock);
+        adminController.initializeStockTable(tblStock);
+        adminController.initializeDeadStockTable(tblDeadStock);
     }
 
     @SuppressWarnings("unchecked")
@@ -74,7 +74,11 @@ public class orderStock extends javax.swing.JFrame {
         btnBack.setIcon(new javax.swing.ImageIcon(("src/main/resources/Material/left-chevron.png"))); // NOI18N
         btnBack.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnBackActionPerformed(evt);
+                try {
+                    btnBackActionPerformed(evt);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
@@ -169,8 +173,13 @@ public class orderStock extends javax.swing.JFrame {
         pack();
     }// </editor-fold>
 
-    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {
+    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) throws SQLException {
+        // TODO add your handling code here:
+        this.dispose();
+        ManagerDashboard managerDashboard= new ManagerDashboard();
+        managerDashboard.setVisible(true);
     }
+
     private void btnReStockActionPerformed(java.awt.event.ActionEvent evt) {
         JTable selectedTable = null;
 

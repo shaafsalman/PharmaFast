@@ -12,8 +12,6 @@ import java.sql.*;
 import java.time.LocalDate;
 
 public class ReportGenerator {
-
-
     private static final Connection connection;
 
     static {

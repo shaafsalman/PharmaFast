@@ -9,9 +9,9 @@ import java.sql.SQLException;
 
 
 public class addStock extends javax.swing.JFrame {
-    AdminController adController = new AdminController();
+    AdminController adminController = new AdminController();
     CsvReader csvReader = new CsvReader();
-
+    
     public addStock() throws SQLException {
         initComponents();
     }
@@ -32,6 +32,15 @@ public class addStock extends javax.swing.JFrame {
             progressBar.setValue(100);
         }
     }
+
+    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) throws SQLException {
+        // TODO add your handling code here:
+        this.dispose();
+        ManagerDashboard managerDashboard= new ManagerDashboard();
+        managerDashboard.setVisible(true);
+
+    }
+
 
 
     @SuppressWarnings("unchecked")
@@ -61,11 +70,19 @@ public class addStock extends javax.swing.JFrame {
 
         txtUserName.setFont(new java.awt.Font("Century Gothic", 0, 18)); // NOI18N
         txtUserName.setForeground(new java.awt.Color(255, 255, 255));
-        txtUserName.setText("Shaaf Salman");
+        adminController.setUser(txtUserName);
 
         btnBack.setBackground(new java.awt.Color(102, 102, 102));
         btnBack.setIcon(new javax.swing.ImageIcon(("src/main/resources/Material/left-chevron.png"))); // NOI18N
-
+        btnBack.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                try {
+                    btnBackActionPerformed(evt);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
         javax.swing.GroupLayout pnlTittleLayout = new javax.swing.GroupLayout(pnlTittle);
         pnlTittle.setLayout(pnlTittleLayout);
         pnlTittleLayout.setHorizontalGroup(

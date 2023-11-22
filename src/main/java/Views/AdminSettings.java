@@ -116,13 +116,18 @@ public class AdminSettings extends javax.swing.JFrame {
 
         lblUsernameHeader.setFont(new java.awt.Font("Century Gothic", 1, 18)); // NOI18N
         lblUsernameHeader.setForeground(new java.awt.Color(255, 255, 255));
-        lblUsernameHeader.setText("Shaaf Salman");
+        adminController.setUser(lblUsernameHeader);
+
 
         btnBack.setBackground(new java.awt.Color(102, 102, 102));
         btnBack.setIcon(new javax.swing.ImageIcon(("src/main/resources/Material/left-chevron.png"))); // NOI18N
         btnBack.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnBackActionPerformed(evt);
+                try {
+                    btnBackActionPerformed(evt);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
@@ -289,8 +294,12 @@ public class AdminSettings extends javax.swing.JFrame {
     }
 
 
-    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {
+    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) throws SQLException {
         // TODO add your handling code here:
+        this.dispose();
+        ManagerDashboard managerDashboard= new ManagerDashboard();
+        managerDashboard.setVisible(true);
+
     }
 
     private void btnEditAdminCodeActionPerformed(java.awt.event.ActionEvent evt) {
@@ -312,6 +321,7 @@ public class AdminSettings extends javax.swing.JFrame {
             lblVat.setText("VAT: " + newVatRate + "%");
         }
     }
+
 
 
     public static void main(String args[]) {

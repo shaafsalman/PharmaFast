@@ -3,6 +3,7 @@ import Dao.CategoryDao;
 import Dao.ProductDao;
 import Dao.UserDao;
 import Helpers.AdminConfig;
+import Helpers.SessionManager;
 import Helpers.UtilityFunctions;
 import Models.Category;
 import Models.Product;
@@ -25,29 +26,28 @@ public class AdminController extends Component {
     private UtilityFunctions uFunctions;
     private static final String CONFIG_FILE = "src/main/resources/Settings/adminConfig.ser";
     private static AdminConfig adminConfig;
+    private  SessionManager sessionManager;
 
 
-    public AdminController() throws SQLException
-    {
+    public AdminController() throws SQLException {
         this.categoryDao = new CategoryDao();
         this.productDao = new ProductDao();
         this.uFunctions = new UtilityFunctions();
         this.userDao = new UserDao();
+        this.sessionManager = new SessionManager();
         loadConfig();
     }
-
-    public AdminController(CategoryDao categoryDao, ProductDao productDao)
-    {
+    public AdminController(CategoryDao categoryDao, ProductDao productDao) {
         this.categoryDao = categoryDao;
         this.productDao = productDao;
         this.uFunctions = new UtilityFunctions();
         this.userDao = new UserDao();
+        this.sessionManager = new SessionManager();
         loadConfig();
     }
 
 
-    public static void saveConfig()
-    {
+    public static void saveConfig() {
         File directory = new File("src/main/resources/Settings");
         if (!directory.exists()) {
             if (!directory.mkdir()) {
@@ -389,6 +389,13 @@ public class AdminController extends Component {
         } else {
             JOptionPane.showMessageDialog(null, "User not found.");
         }
+    }
+
+
+
+    public void setUser(JLabel usernameLabel)
+    {
+        usernameLabel.setText(sessionManager.getName());
     }
 
 }

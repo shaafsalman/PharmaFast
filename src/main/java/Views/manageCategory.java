@@ -21,13 +21,13 @@ import java.util.Map;
  */
 public class manageCategory extends javax.swing.JFrame {
 
-    AdminController adController = new AdminController();
+    AdminController adminController = new AdminController();
 
     public manageCategory() throws SQLException
     {
 
         initComponents();
-        adController.initializeCategoryTable(tblCategory);
+        adminController.initializeCategoryTable(tblCategory);
     }
 
     @SuppressWarnings("unchecked")
@@ -58,13 +58,17 @@ public class manageCategory extends javax.swing.JFrame {
 
         lblUsernameHeader.setFont(new java.awt.Font("Century Gothic", 1, 18)); // NOI18N
         lblUsernameHeader.setForeground(new java.awt.Color(255, 255, 255));
-        lblUsernameHeader.setText("Shaaf Salman");
+        adminController.setUser(lblUsernameHeader);
 
         btnBack.setBackground(new java.awt.Color(102, 102, 102));
         btnBack.setIcon(new javax.swing.ImageIcon(("src/main/resources/Material/left-chevron.png"))); // NOI18N
         btnBack.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnBackActionPerformed(evt);
+                try {
+                    btnBackActionPerformed(evt);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
@@ -184,14 +188,18 @@ public class manageCategory extends javax.swing.JFrame {
     }// </editor-fold>
 
 
-    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {
+    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) throws SQLException {
+        this.dispose();
+        ManagerDashboard managerDashboard= new ManagerDashboard();
+        managerDashboard.setVisible(true);
     }
+
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {
         String categoryName = JOptionPane.showInputDialog(this, "Enter Category Name:");
 
         if (categoryName != null && !categoryName.isEmpty()) {
             Category newCategory = new Category(0, categoryName);
-            boolean categoryAdded = adController.addCategory(newCategory);
+            boolean categoryAdded = adminController.addCategory(newCategory);
 
             if (categoryAdded) {
                 JOptionPane.showMessageDialog(this, "Category added successfully!");
@@ -199,7 +207,7 @@ public class manageCategory extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(this, "Error adding the category. Please try again.");
             }
 
-            adController.initializeCategoryTable(tblCategory);
+            adminController.initializeCategoryTable(tblCategory);
         }
     }
     private void btnModifyActionPerformed(java.awt.event.ActionEvent evt) {
@@ -218,11 +226,11 @@ public class manageCategory extends javax.swing.JFrame {
 
         if (newName != null && !newName.isEmpty()) {
             Category updatedCategory = new Category(categoryID, newName);
-            boolean updated = adController.editCategory(updatedCategory);
+            boolean updated = adminController.editCategory(updatedCategory);
 
             if (updated)
             {
-                adController.initializeCategoryTable(tblCategory);
+                adminController.initializeCategoryTable(tblCategory);
             }
             else
             {
@@ -242,8 +250,8 @@ public class manageCategory extends javax.swing.JFrame {
         String name = (String) tblCategory.getValueAt(selectedRow, 1);
         categoryID = (int) tblCategory.getValueAt(selectedRow, 0);
 
-        if (adController.deleteCategory(categoryID)) {
-            adController.initializeCategoryTable(tblCategory);
+        if (adminController.deleteCategory(categoryID)) {
+            adminController.initializeCategoryTable(tblCategory);
         } else {
             JOptionPane.showMessageDialog(this, "Failed to delete " + name + " " + categoryID);
         }

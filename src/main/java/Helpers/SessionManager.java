@@ -21,4 +21,12 @@ public class SessionManager {
     public static void logout() {
         currentUser = null;
     }
+
+    public String getName(){
+        if (currentUser == null) {
+         return"Shaaf Salman SS";
+        }
+
+        return currentUser.getUsername();}
+
 }
