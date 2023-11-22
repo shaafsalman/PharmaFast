@@ -16,19 +16,19 @@ import java.util.Map;
  *
  * @author ShaafSalman
  */
-public class manageProducts extends javax.swing.JFrame {
+public class ManageProducts extends javax.swing.JFrame {
 
     /**
      * Creates new form manageProducts
      */
 
-    AdminController adController = new AdminController();
-    UtilityFunctions uf = new UtilityFunctions();
+    AdminController adminController = new AdminController();
+    UtilityFunctions uFunctions = new UtilityFunctions();
 
-    public manageProducts() throws SQLException
+    public ManageProducts() throws SQLException
     {
         initComponents();
-        adController.initializeProductsTable(tblProducts);
+        adminController.initializeProductsTable(tblProducts);
 
     }
 
@@ -75,13 +75,18 @@ public class manageProducts extends javax.swing.JFrame {
 
         lblUsernameHeader.setFont(new java.awt.Font("Century Gothic", 1, 18)); // NOI18N
         lblUsernameHeader.setForeground(new java.awt.Color(255, 255, 255));
-        lblUsernameHeader.setText("Shaaf Salman");
+        adminController.setUser(lblUsernameHeader);
+
 
         btnBack.setBackground(new java.awt.Color(102, 102, 102));
         btnBack.setIcon(new javax.swing.ImageIcon(("src/main/resources/Material/left-chevron.png"))); // NOI18N
         btnBack.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnBackActionPerformed(evt);
+                try {
+                    btnBackActionPerformed(evt);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
@@ -195,10 +200,15 @@ public class manageProducts extends javax.swing.JFrame {
 
 
 
-    JComboBox<String> yearComboBox = uf.createExpiryYearComboBox();
-    JComboBox<String> monthComboBox = uf.createMonthComboBox();
-    JComboBox<String> dayComboBox = uf.createDayComboBox();
-    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {
+    JComboBox<String> yearComboBox = uFunctions.createExpiryYearComboBox();
+    JComboBox<String> monthComboBox = uFunctions.createMonthComboBox();
+    JComboBox<String> dayComboBox = uFunctions.createDayComboBox();
+    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) throws SQLException {
+        // TODO add your handling code here:
+        this.dispose();
+        ManagerDashboard managerDashboard= new ManagerDashboard();
+        managerDashboard.setVisible(true);
+
     }
     private void btnModifyActionPerformed(java.awt.event.ActionEvent evt) {
         int selectedRow = tblProducts.getSelectedRow();
@@ -216,7 +226,7 @@ public class manageProducts extends javax.swing.JFrame {
         double sellingPrice = (double) tblProducts.getValueAt(selectedRow, 4);
         int quantity = (int) tblProducts.getValueAt(selectedRow, 5);
         String category = (String) tblProducts.getValueAt(selectedRow, 1);
-        int categoryID = adController.getCategoryIDByName(category);
+        int categoryID = adminController.getCategoryIDByName(category);
         java.sql.Date expiryDate = (java.sql.Date) tblProducts.getValueAt(selectedRow, 6);
 
 
@@ -249,11 +259,11 @@ public class manageProducts extends javax.swing.JFrame {
 
         Product updatedProduct = new Product(productID, productName, costPrice, sellingPrice, quantity,categoryID,expiryDate);
 
-        boolean updateResult = adController.updateProduct(updatedProduct);
+        boolean updateResult = adminController.updateProduct(updatedProduct);
 
         if (updateResult) {
             JOptionPane.showMessageDialog(this, "Product " + productName + " (ID: " + productID + ") details updated successfully.");
-            adController.initializeProductsTable(tblProducts);
+            adminController.initializeProductsTable(tblProducts);
         } else {
             JOptionPane.showMessageDialog(this, "Failed to update product details for " + productName + " (ID: " + productID + ")");
         }
@@ -265,7 +275,7 @@ public class manageProducts extends javax.swing.JFrame {
         int quantity = 0;
 
         Map<Integer, String> categoryData = new HashMap<>();
-        boolean success = adController.getCategoryData(categoryData);
+        boolean success = adminController.getCategoryData(categoryData);
 
         if (!success) {
             JOptionPane.showMessageDialog(null, "Failed to retrieve category data. Please try again later.");
@@ -305,9 +315,9 @@ public class manageProducts extends javax.swing.JFrame {
             quantity = Integer.parseInt(inputQuantityStr);
         }
 
-        JComboBox<String> yearComboBox = uf.createExpiryYearComboBox();
-        JComboBox<String> monthComboBox = uf.createMonthComboBox();
-        JComboBox<String> dayComboBox = uf.createDayComboBox();
+        JComboBox<String> yearComboBox = uFunctions.createExpiryYearComboBox();
+        JComboBox<String> monthComboBox = uFunctions.createMonthComboBox();
+        JComboBox<String> dayComboBox = uFunctions.createDayComboBox();
 
         JPanel expiryPanel = new JPanel();
         expiryPanel.add(yearComboBox);
@@ -326,7 +336,7 @@ public class manageProducts extends javax.swing.JFrame {
                 String selectedMonth = (String) monthComboBox.getSelectedItem();
                 String selectedDay = (String) dayComboBox.getSelectedItem();
 
-                validDate = uf.isValidDate(Integer.parseInt(selectedYear), Integer.parseInt(selectedMonth), Integer.parseInt(selectedDay));
+                validDate = uFunctions.isValidDate(Integer.parseInt(selectedYear), Integer.parseInt(selectedMonth), Integer.parseInt(selectedDay));
 
                 if (!validDate) {
                     JOptionPane.showMessageDialog(null, "Please enter a valid date.");
@@ -346,11 +356,11 @@ public class manageProducts extends javax.swing.JFrame {
 
             Product newProduct = new Product(0, productName, costPrice, sellingPrice, quantity,categoryID,sqlDate);
 
-            boolean addResult = adController.addProduct(newProduct);
+            boolean addResult = adminController.addProduct(newProduct);
 
             if (addResult) {
                 JOptionPane.showMessageDialog(this, "Product " + productName + " added successfully.");
-                adController.initializeProductsTable(tblProducts);
+                adminController.initializeProductsTable(tblProducts);
             } else {
                 JOptionPane.showMessageDialog(this, "Failed to add product " + productName);
             }
@@ -371,10 +381,10 @@ public class manageProducts extends javax.swing.JFrame {
         String name =(String) tblProducts.getValueAt(selectedRow, 2);
         productID =(int) tblProducts.getValueAt(selectedRow, 0);
 
-        if (adController.deleteProduct(productID))
+        if (adminController.deleteProduct(productID))
         {
             JOptionPane.showMessageDialog(this, "Product" + name + ": " +productID);
-            adController.initializeProductsTable(tblProducts);
+            adminController.initializeProductsTable(tblProducts);
         }
         else
         {
@@ -394,19 +404,19 @@ public class manageProducts extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(manageProducts.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ManageProducts.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(manageProducts.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ManageProducts.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(manageProducts.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ManageProducts.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(manageProducts.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ManageProducts.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
 
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    new manageProducts().setVisible(true);
+                    new ManageProducts().setVisible(true);
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }

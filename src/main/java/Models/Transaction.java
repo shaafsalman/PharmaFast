@@ -1,53 +1,57 @@
 package Models;
 
-
-
+import java.sql.Timestamp;
 import java.util.Date;
 
 public class Transaction {
     private int transactionID;
+    private int userID;
     private double totalCost;
-    private Date transactionDate;
-    private int productID;
-    private int quantity;
+    private Timestamp transactionDate;
 
-    public Transaction(int transactionID, double totalCost, Date transactionDate, int productID, int quantity) {
+
+    public Transaction(int transactionID, int userID, double totalCost, Timestamp transactionDate, int productID, int quantity) {
         this.transactionID = transactionID;
-
+        this.userID = userID;
         this.totalCost = totalCost;
         this.transactionDate = transactionDate;
-        this.productID = productID;
-        this.quantity = quantity;
+
+    }
+
+    public Transaction() {
+
     }
 
     public int getTransactionID() {
         return transactionID;
     }
 
+    public int getUserID() {
+        return userID;
+    }
+
     public double getTotalCost() {
         return totalCost;
     }
 
-    public Date getTransactionDate() {
+    public Timestamp getTransactionDate() {
         return transactionDate;
     }
 
-    public int getProductID() {
-        return productID;
+
+    public void setUserID(int userID) {
+        this.userID=userID;
     }
 
-    public int getQuantity() {
-        return quantity;
+    public void setTotalCost(double v) {
+        this.totalCost = v;
     }
 
-    // Calculate the cost based on quantity and product cost
-    public double calculateCost(double productCost) {
-        return quantity * productCost;
+    public void setTransactionDate(Timestamp timestamp) {
+       this.transactionDate = timestamp;
     }
 
-    // Calculate the profit based on quantity, product cost, and selling price
-    public double calculateProfit(double productCost, double sellingPrice) {
-        double cost = calculateCost(productCost);
-        return quantity * (sellingPrice - cost);
+    public void setTransactionID(int generatedID) {
+        this.transactionID = generatedID;
     }
 }

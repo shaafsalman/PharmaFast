@@ -6,9 +6,10 @@ import Models.User;
 import java.sql.SQLException;
 
 public class Login extends javax.swing.JFrame {
+    UserController RegisterController = new UserController();
 
 
-    public Login() {
+    public Login() throws SQLException {
         initComponents();
     }
 
@@ -166,7 +167,6 @@ public class Login extends javax.swing.JFrame {
     private void btnRegisterActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
         this.dispose();
-
         Sighnup sighnupFrame = new Sighnup();
         sighnupFrame.setVisible(true);
     }
@@ -174,10 +174,11 @@ public class Login extends javax.swing.JFrame {
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) throws SQLException {
         String username = txtUsername.getText().trim();
         String password = new String(txtPassword.getPassword()).trim();
+       // System.out.println(username+ password );
 
-        UserController RegisterController = new UserController();
         User loggedInUser = UserController.loginUser(username, password);
-        if (loggedInUser != null) {
+        if (loggedInUser != null)
+        {
             this.dispose();
             openDashboardBasedOnRole(loggedInUser.getRole());
         }
@@ -188,7 +189,7 @@ public class Login extends javax.swing.JFrame {
             ManagerDashboard managerDashboard = new ManagerDashboard();
             managerDashboard.setVisible(true);
         } else {
-            transactionHub transactionHub = new transactionHub();
+            TransactionHub transactionHub = new TransactionHub();
             transactionHub.setVisible(true);
         }
     }
@@ -199,7 +200,11 @@ public class Login extends javax.swing.JFrame {
 
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Login().setVisible(true);
+                try {
+                    new Login().setVisible(true);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
     }

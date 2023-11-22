@@ -6,6 +6,8 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -170,5 +172,38 @@ public class UtilityFunctions {
         table.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
 
     }
+
+    public void displayGraph(String filePath) {
+        if (filePath != null && !filePath.isEmpty()) {
+            try {
+                System.out.println("File Path: " + filePath);
+
+                ImageIcon icon = new ImageIcon(filePath);
+                Image image = icon.getImage();
+
+                JLabel label = new JLabel(new ImageIcon(image));
+
+                JFrame frame = new JFrame("Graph Display");
+                frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                frame.getContentPane().add(label);
+                frame.pack();
+                frame.setLocationRelativeTo(null); // Center the frame
+                frame.setVisible(true);
+
+                frame.addWindowListener(new WindowAdapter() {
+                    @Override
+                    public void windowClosed(WindowEvent e) {
+                        frame.dispose();
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Error displaying graph.");
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Graph generation failed. File path is empty or null.");
+        }
+    }
+
 
 }

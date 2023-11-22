@@ -7,6 +7,7 @@ import Controllers.UserController;
 import Models.User;
 
 import javax.swing.*;
+import java.sql.SQLException;
 
 /**
  *
@@ -88,7 +89,11 @@ public class Sighnup extends javax.swing.JFrame {
         btnLogin.setText("Login");
         btnLogin.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnLoginActionPerformed(evt);
+                try {
+                    btnLoginActionPerformed(evt);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
@@ -224,7 +229,7 @@ public class Sighnup extends javax.swing.JFrame {
     }
 
 
-    private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {
+    private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) throws SQLException {
         this.dispose();
 
         Login loginFrame = new Login();

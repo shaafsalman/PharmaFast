@@ -11,12 +11,12 @@ import java.sql.SQLException;
  *
  * @author ShaafSalman
  */
-public class orderStock extends javax.swing.JFrame {
+public class OrderStock extends javax.swing.JFrame {
 
     AdminController adminController = new AdminController();
     UtilityFunctions uFunctions = new UtilityFunctions();
 
-    public orderStock() throws SQLException {
+    public OrderStock() throws SQLException {
 
         initComponents();
         adminController.initializeStockTable(tblStock);
@@ -218,7 +218,7 @@ public class orderStock extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    new orderStock().setVisible(true);
+                    new OrderStock().setVisible(true);
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }

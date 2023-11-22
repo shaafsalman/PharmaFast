@@ -68,7 +68,6 @@ public class ProductDao {
             return false;
         }
     }
-
     public String getProductName(String productID) {
         String query = "SELECT ProductName FROM Products WHERE ProductID = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {

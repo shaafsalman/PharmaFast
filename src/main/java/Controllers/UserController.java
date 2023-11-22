@@ -4,11 +4,25 @@ import Dao.UserDao;
 import Helpers.SessionManager;
 import Models.User;
 import javax.swing.JOptionPane;
+import java.sql.SQLException;
 
 public class UserController {
 
-    private static final int ADMIN_CODE = AdminController.getAdminCode();
-    private static UserDao userDao = new UserDao();
+    static AdminController adminController;
+
+    static {
+        try {
+            adminController = new AdminController();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final int ADMIN_CODE = adminController.getAdminCode();
+    private static final UserDao userDao = new UserDao();
+
+    public UserController() throws SQLException {
+    }
 
     public static boolean registerUser(User user, int adminCode) {
 
@@ -34,9 +48,11 @@ public class UserController {
         User user = userDao.authenticateUser(username, password);
         if (user != null)
         {
+            System.out.println(user.getUsername() + user.getPassword());
             Helpers.SessionManager.setCurrentUser(user);
             return user;
-        } else {
+        } else
+        {
             JOptionPane.showMessageDialog(null, "Invalid username or password.");
             return null;
         }

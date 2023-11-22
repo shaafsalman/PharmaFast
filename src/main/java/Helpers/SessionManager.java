@@ -29,4 +29,16 @@ public class SessionManager {
 
         return currentUser.getUsername();}
 
+    public String getRole() {
+        if (currentUser == null) {
+            return "Manager";
+        }
+        return currentUser.getRole();
+    }
+
+    public int getUserID() { if (currentUser == null) {
+        return 0;
+    }
+        return currentUser.getUserID();
+    }
 }

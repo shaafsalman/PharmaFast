@@ -8,11 +8,11 @@ import java.io.File;
 import java.sql.SQLException;
 
 
-public class addStock extends javax.swing.JFrame {
+public class AddStock extends javax.swing.JFrame {
     AdminController adminController = new AdminController();
     CsvReader csvReader = new CsvReader();
     
-    public addStock() throws SQLException {
+    public AddStock() throws SQLException {
         initComponents();
     }
     private void btnUploadActionPerformed(java.awt.event.ActionEvent evt) {
@@ -182,7 +182,7 @@ public class addStock extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    new addStock().setVisible(true);
+                    new AddStock().setVisible(true);
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }

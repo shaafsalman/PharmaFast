@@ -35,6 +35,7 @@ public class AdminController extends Component {
         this.uFunctions = new UtilityFunctions();
         this.userDao = new UserDao();
         this.sessionManager = new SessionManager();
+        this.adminConfig = new AdminConfig();
         loadConfig();
     }
     public AdminController(CategoryDao categoryDao, ProductDao productDao) {
@@ -43,6 +44,7 @@ public class AdminController extends Component {
         this.uFunctions = new UtilityFunctions();
         this.userDao = new UserDao();
         this.sessionManager = new SessionManager();
+        this.adminConfig = new AdminConfig();
         loadConfig();
     }
 
@@ -398,6 +400,8 @@ public class AdminController extends Component {
         usernameLabel.setText(sessionManager.getName());
     }
 
+    public void setRole(JLabel lblUserRoles) {lblUserRoles.setText(sessionManager.getRole());
+    }
 }
 
 

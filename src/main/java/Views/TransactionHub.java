@@ -2,8 +2,14 @@ package Views;
 
 import Controllers.AdminController;
 import Controllers.CashierController;
+import Dao.TransactionDao;
+import Dao.TransactionItemDao;
 import Helpers.ReportGenerator;
+import Helpers.SessionManager;
 import Helpers.UtilityFunctions;
+import Models.Transaction;
+import Models.TransactionItem;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.*;
@@ -11,23 +17,27 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 
 /**
  *
  * @author ShaafSalman
  */
-public class transactionHub extends javax.swing.JFrame {
+public class TransactionHub extends javax.swing.JFrame {
 
 
     CashierController csController = new CashierController();
-    AdminController adController = new AdminController();
+    AdminController adminController = new AdminController();
     UtilityFunctions uFunctions = new UtilityFunctions();
-
     ReportGenerator reportGenerator = new ReportGenerator();
+    SessionManager sessionManager = new SessionManager();
+    TransactionDao transactionDao = new TransactionDao();
+    TransactionItemDao transactionItemDao = new TransactionItemDao();
+    
 
 
 
-    public transactionHub() throws SQLException {
+    public TransactionHub() throws SQLException {
         initComponents();
         optimizTable(tblCart);
 
@@ -59,6 +69,22 @@ public class transactionHub extends javax.swing.JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 handlePayment();
+            }
+        });
+
+        getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F1"), "handlePayment");
+        getRootPane().getActionMap().put("handlePayment", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                handlePayment();
+            }
+        });
+
+        getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F1"), "triggerProcessButton");
+        getRootPane().getActionMap().put("triggerProcessButton", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                btnProcessActionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
             }
         });
 
@@ -179,6 +205,40 @@ public class transactionHub extends javax.swing.JFrame {
     private void btnTenderF3ActionPerformed(java.awt.event.ActionEvent evt) {
         handlePayment();
     }
+
+
+    private void saveTransactions() {
+        Transaction transaction = new Transaction();
+        transaction.setUserID(sessionManager.getUserID());
+        transaction.setTotalCost(Double.parseDouble(txtTotalAmount.getText()));
+        transaction.setTransactionDate(new Timestamp(System.currentTimeMillis()));
+
+        if(transactionDao.addTransaction(transaction))
+        {
+            System.out.println("transaction added "+transaction.getTransactionID() );
+        }
+        int transactionID = transaction.getTransactionID();
+
+
+        DefaultTableModel model = (DefaultTableModel) tblCart.getModel();
+        for (int i = 0; i < model.getRowCount(); i++) {
+            TransactionItem transactionItem = new TransactionItem();
+            transactionItem.setTransactionID(transactionID);
+            transactionItem.setProductID(Integer.parseInt(model.getValueAt(i, 0).toString()));
+            transactionItem.setQuantity((int) model.getValueAt(i, 4));
+
+            if(transactionItemDao.addTransactionItem(transactionItem))
+            {
+                System.out.println("transaction item "+transactionItem.getProductID() );
+            }
+
+        }
+
+        System.out.println("Transactions saved successfully");
+    }
+
+
+
     private void handlePayment() {
         double totalAmount = Double.parseDouble(txtTotalAmount.getText());
 
@@ -191,6 +251,8 @@ public class transactionHub extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(null, "Payment successful. Change: " + change);
                 txtChange.setText(String.valueOf(change));
                 txtAmountTender.setText(String.valueOf(paidAmount));
+                saveTransactions();
+
             } else {
                 JOptionPane.showMessageDialog(null, "Insufficient payment. The paid amount is less than the total amount.");
             }
@@ -290,8 +352,7 @@ public class transactionHub extends javax.swing.JFrame {
 
         txtUserName.setFont(new java.awt.Font("Century Gothic", 0, 18)); // NOI18N
         txtUserName.setForeground(new java.awt.Color(255, 255, 255));
-        txtUserName.setText("Shaaf Salman");
-
+        adminController.setUser(txtUserName);
         btnBack.setBackground(new java.awt.Color(102, 102, 102));
         btnBack.setIcon(new javax.swing.ImageIcon(("src/main/resources/Material/left-chevron.png"))); // NOI18N
 
@@ -627,7 +688,7 @@ public class transactionHub extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    new transactionHub().setVisible(true);
+                    new TransactionHub().setVisible(true);
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }

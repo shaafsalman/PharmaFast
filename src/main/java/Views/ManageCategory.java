@@ -4,26 +4,18 @@ import Controllers.AdminController;
 import Models.Category;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
-import javax.swing.table.TableCellRenderer;
-import java.awt.*;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**
  *
  * @author ShaafSalman
  */
-public class manageCategory extends javax.swing.JFrame {
+public class ManageCategory extends javax.swing.JFrame {
 
     AdminController adminController = new AdminController();
 
-    public manageCategory() throws SQLException
+    public ManageCategory() throws SQLException
     {
 
         initComponents();
@@ -266,7 +258,7 @@ public class manageCategory extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    new manageCategory().setVisible(true);
+                    new ManageCategory().setVisible(true);
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }

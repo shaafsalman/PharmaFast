@@ -21,6 +21,7 @@ public class ReportGenerator {
             throw new RuntimeException(e);
         }
     }
+
     public static String generateReport(String reportType, String date) {
         LocalDate day = LocalDate.now();
         String pdfOutputFile = "src/main/resources/Reports/" + reportType + "for" + date + "_" + day + ".pdf";
@@ -116,7 +117,6 @@ public class ReportGenerator {
         }
         return pdfOutputFile;
     }
-
     private static PdfPCell getHeaderCell(String content) {
         com.itextpdf.text.Font font = FontFactory.getFont("Century Gothic", 14, BaseColor.WHITE);
         PdfPCell cell = new PdfPCell(new Phrase(content, font));

@@ -12,7 +12,7 @@ import java.sql.SQLException;
  *
  * @author ShaafSalman
  */
-public class manageReports extends javax.swing.JFrame {
+public class ManageReports extends javax.swing.JFrame {
 
     ReportGenerator reportGenerator = new ReportGenerator();
     UtilityFunctions uf = new UtilityFunctions();
@@ -23,7 +23,7 @@ public class manageReports extends javax.swing.JFrame {
     AdminController adminController = new AdminController();
 
 
-    public manageReports() throws SQLException {
+    public ManageReports() throws SQLException {
         initComponents();
     }
 
@@ -170,7 +170,11 @@ public class manageReports extends javax.swing.JFrame {
         btnBack1.setIcon(new javax.swing.ImageIcon(("src/main/resources/Material/left-chevron.png"))); // NOI18N
         btnBack1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnBack1ActionPerformed(evt);
+                try {
+                    btnBack1ActionPerformed(evt);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
@@ -279,8 +283,11 @@ public class manageReports extends javax.swing.JFrame {
 
     }
 
-
-    private void btnBack1ActionPerformed(java.awt.event.ActionEvent evt) {
+    private void btnBack1ActionPerformed(java.awt.event.ActionEvent evt) throws SQLException {
+        // TODO add your handling code here:
+        this.dispose();
+        ManagerDashboard managerDashboard= new ManagerDashboard();
+        managerDashboard.setVisible(true);
 
     }
 
@@ -375,7 +382,7 @@ public class manageReports extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    new manageReports().setVisible(true);
+                    new ManageReports().setVisible(true);
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }

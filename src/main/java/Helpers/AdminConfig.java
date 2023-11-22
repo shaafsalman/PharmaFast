@@ -13,6 +13,10 @@ public class AdminConfig implements Serializable {
         this.adminCode = adminCode;
     }
 
+    public AdminConfig() {
+
+    }
+
     // Getters and Setters
     public float getVatRate() {
         return vatRate;
