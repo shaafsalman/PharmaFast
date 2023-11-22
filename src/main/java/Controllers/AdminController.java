@@ -1,59 +1,87 @@
 package Controllers;
 import Dao.CategoryDao;
 import Dao.ProductDao;
+import Dao.UserDao;
 import Helpers.AdminConfig;
-import Helpers.ConnectionFile;
 import Helpers.UtilityFunctions;
 import Models.Category;
 import Models.Product;
-import com.itextpdf.text.*;
-import com.itextpdf.text.Image;
-import com.itextpdf.text.pdf.PdfPCell;
-import com.itextpdf.text.pdf.PdfPTable;
-import com.itextpdf.text.pdf.PdfWriter;
+import Models.User;
+
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
-import javax.swing.table.TableCellRenderer;
 import java.awt.*;
-import java.awt.Font;
 import java.io.*;
 import java.sql.*;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
-public class AdminController {
+public class AdminController extends Component {
 
-    private  CategoryDao categoryDao;
-    private  ProductDao productDao;
-    private  UtilityFunctions uFunctions;
-    private static final String CONFIG_FILE = "adminConfig.ser";
-    private static AdminConfig adminConfig = new AdminConfig(5.0f, 1122);
+    private CategoryDao categoryDao;
+    private ProductDao productDao;
+    private UserDao userDao;
+    private UtilityFunctions uFunctions;
+    private static final String CONFIG_FILE = "src/main/resources/Settings/adminConfig.ser";
+    private static AdminConfig adminConfig;
 
-    public static void saveConfig() {
+
+    public AdminController() throws SQLException
+    {
+        this.categoryDao = new CategoryDao();
+        this.productDao = new ProductDao();
+        this.uFunctions = new UtilityFunctions();
+        this.userDao = new UserDao();
+        loadConfig();
+    }
+
+    public AdminController(CategoryDao categoryDao, ProductDao productDao)
+    {
+        this.categoryDao = categoryDao;
+        this.productDao = productDao;
+        this.uFunctions = new UtilityFunctions();
+        this.userDao = new UserDao();
+        loadConfig();
+    }
+
+
+    public static void saveConfig()
+    {
+        File directory = new File("src/main/resources/Settings");
+        if (!directory.exists()) {
+            if (!directory.mkdir()) {
+                System.err.println("Unable to create the 'Settings' directory.");
+                return;
+            }
+        }
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(CONFIG_FILE))) {
             oos.writeObject(adminConfig);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
     public static void loadConfig() {
+        File directory = new File("src/main/resources/Settings");
+        if (!directory.exists()) {
+            if (!directory.mkdir()) {
+                System.err.println("Unable to create the 'Settings' directory.");
+                return;
+            }
+        }
+
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(CONFIG_FILE))) {
             adminConfig = (AdminConfig) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+            adminConfig = new AdminConfig(5.0f, 1122);
+            saveConfig();
         }
     }
 
     public static float getVatRate() {
         return adminConfig.getVatRate();
     }
+
     public static void setVatRate(float newVatRate) {
         adminConfig.setVatRate(newVatRate);
         saveConfig();
@@ -62,24 +90,14 @@ public class AdminController {
     public static int getAdminCode() {
         return adminConfig.getAdminCode();
     }
+
     public static void setAdminCode(int newAdminCode) {
         adminConfig.setAdminCode(newAdminCode);
         saveConfig();
     }
 
-    public AdminController() throws SQLException
-    {
-        this.categoryDao = new CategoryDao();
-        this.productDao = new ProductDao();
-        this.uFunctions = new UtilityFunctions();
-    }
 
-    public AdminController(CategoryDao categoryDao, ProductDao productDao)
-    {
-        this.categoryDao = categoryDao;
-        this.productDao = productDao;
-        this.uFunctions = new UtilityFunctions();
-    }
+
 
     public boolean getCategoryData(Map<Integer, String> categoryData) {
         return categoryDao.getCategoryData(categoryData);
@@ -258,6 +276,61 @@ public class AdminController {
         table.getColumnModel().getColumn(2).setPreferredWidth(100);
 
     }
+    public void initializeUsersTable(JTable table) {
+        DefaultTableModel model = new DefaultTableModel(new Object[]{"UserID", "Username", "Role"}, 0);
+        ResultSet resultSet = null;
+
+        if (userDao.getUserData(model))
+        {
+            uFunctions.initializeUForTable(table);
+            table.setModel(model);
+            table.getColumnModel().getColumn(0).setPreferredWidth(80);
+            table.getColumnModel().getColumn(1).setPreferredWidth(200);
+            table.getColumnModel().getColumn(2).setPreferredWidth(200);
+        } else {
+            JOptionPane.showMessageDialog(null, "Database Error");
+        }
+    }
+
+
+    public void showAddUserDialog() {
+        JComboBox<String> cboRoles;
+        String username = JOptionPane.showInputDialog(null, "Enter username:");
+        String email = JOptionPane.showInputDialog(null, "Enter email:");
+        String password = JOptionPane.showInputDialog(null, "Enter password:");
+        String repeatPassword = JOptionPane.showInputDialog(null, "Repeat password:");
+
+        String[] roles = {"Sales Assistant", "Manager"};
+        cboRoles = new JComboBox<>(roles);
+
+        Object[] message = {
+                "Username:", username,
+                "Email:", email,
+                "Password:", password,
+                "Repeat Password:", repeatPassword,
+                "Role:", cboRoles
+        };
+
+        int option = JOptionPane.showConfirmDialog(null, message, "Add User", JOptionPane.OK_CANCEL_OPTION);
+
+        if (option == JOptionPane.OK_OPTION)
+        {
+            if (UtilityFunctions.validateEmail(email) && UtilityFunctions.validatePassword(password, repeatPassword)) {
+                String selectedRole = (String) cboRoles.getSelectedItem();
+                User newUser = new User(0, username, password, selectedRole);
+                addUser(newUser);
+            } else {
+                JOptionPane.showMessageDialog(null, "Invalid email or password.");
+            }
+        }
+    }
+    public void addUser(User newUser)
+    {
+        userDao.addUser(newUser);
+    }
+
+
+
 
     public static void main(String[] args) {
         //String yearlyReport = generateReport("yearly", "2023");
@@ -267,6 +340,56 @@ public class AdminController {
     }
 
 
+    public boolean deleteUser(int userID) {return userDao.deleteUser(userID);}
+
+    public void showModifyUserDialog(int userID) {
+        User existingUser = userDao.getUser(userID);
+
+        if (existingUser != null) {
+            JTextField txtUsername = new JTextField(existingUser.getUsername());
+            JPasswordField txtPassword = new JPasswordField(existingUser.getPassword());
+            JPasswordField txtRepeatPassword = new JPasswordField(existingUser.getPassword()); // For password confirmation
+            JComboBox<String> cboRoles = new JComboBox<>(new String[]{"Sales Assistant", "Manager"});
+            cboRoles.setSelectedItem(existingUser.getRole());
+
+            Object[] message = {
+                    "Username:", txtUsername,
+                    "Password:", txtPassword,
+                    "Repeat Password:", txtRepeatPassword,
+                    "Role:", cboRoles
+            };
+
+            int option = JOptionPane.showConfirmDialog(null, message, "Modify User", JOptionPane.OK_CANCEL_OPTION);
+
+            if (option == JOptionPane.OK_OPTION) {
+                // Get values from the input fields
+                String newUsername = txtUsername.getText();
+                String newPassword = new String(txtPassword.getPassword());
+                String repeatedPassword = new String(txtRepeatPassword.getPassword());
+                String selectedRole = (String) cboRoles.getSelectedItem();
+
+                // Validate input if needed (e.g., check if passwords match)
+                if (!newPassword.equals(repeatedPassword)) {
+                    JOptionPane.showMessageDialog(null, "Passwords do not match.");
+                    return;
+                }
+
+                // Update the existing user object
+                existingUser.setUsername(newUsername);
+                existingUser.setPassword(newPassword);
+                existingUser.setRole(selectedRole);
+
+                // Update the user in the database
+                if (userDao.updateUser(existingUser)) {
+                    JOptionPane.showMessageDialog(null, "User modified successfully.");
+                } else {
+                    JOptionPane.showMessageDialog(null, "Failed to modify user.");
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "User not found.");
+        }
+    }
 
 }
 

@@ -61,6 +61,16 @@ public class UtilityFunctions {
 
         return yearComboBox;
     }
+
+    public static boolean validateEmail(String email) {
+        return email.contains("@");
+    }
+
+
+    public static boolean validatePassword(String password, String repeatPassword) {
+        return password.equals(repeatPassword);
+    }
+
     public static boolean isValidDate(int year, int month, int day) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         dateFormat.setLenient(false);

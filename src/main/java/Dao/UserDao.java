@@ -3,6 +3,7 @@ package Dao;
 import Helpers.ConnectionFile;
 import Models.User;
 
+import javax.swing.table.DefaultTableModel;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -106,6 +107,34 @@ public class UserDao {
         }
         return users;
     }
+
+
+    public boolean getUserData(DefaultTableModel model) {
+        String sql = "SELECT * FROM Users";
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                int userId = resultSet.getInt("UserID");
+                String username = resultSet.getString("Username");
+                String role = resultSet.getString("Role");
+
+                model.addRow(new Object[]{userId, username, role});
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
+
 
 
     public User authenticateUser(String username, String password) {
