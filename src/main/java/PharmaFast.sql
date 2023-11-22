@@ -67,13 +67,53 @@ VALUES
     ('sa', '1122', 'Sales Assistant');
 
 
+
+
+
+-- Variables for random data generation
+DECLARE @maxProducts INT = 20; -- assuming a transaction can have up to 20 different products
+DECLARE @quantityRange INT = 5; -- max quantity of each product in a transaction
+DECLARE @daysRange INT = 365; -- range of days for the transaction date (last year)
+DECLARE @baseDate DATE = '2022-01-01'; -- base date for transactions
+DECLARE @maxProductID INT = 1092; -- replace with the highest product ID in your Products table
+
+-- Insert 300 transactions
+DECLARE @i INT = 1;
+WHILE @i <= 300
+BEGIN
+        DECLARE @userID INT = 1; -- as specified
+        DECLARE @transactionDate DATE = DATEADD(day, RAND() * @daysRange, @baseDate);
+        DECLARE @totalCost DECIMAL(10, 2) = 0;
+
 INSERT INTO Transactions (UserID, TotalCost, TransactionDate)
-VALUES
-    (1, 25.45, '2023-10-15 14:30:00'),
-    (2, 15.75, '2023-10-16 10:15:00');
+VALUES (@userID, @totalCost, @transactionDate); -- initial total cost is 0, will update later
+
+DECLARE @transactionID INT = SCOPE_IDENTITY(); -- get the last inserted transaction ID
+
+        -- Insert random transaction items
+        DECLARE @j INT = 1;
+        DECLARE @numProducts INT = RAND() * @maxProducts + 1; -- number of products in the transaction
+        WHILE @j <= @numProducts
+BEGIN
+                DECLARE @productID INT = RAND() * @maxProductID + 1;
+                DECLARE @quantity INT = RAND() * @quantityRange + 1;
+                DECLARE @price DECIMAL(10, 2);
+                DECLARE @sellingPrice DECIMAL(10, 2);
+
+                -- Get product price and selling price
+SELECT @price = Price, @sellingPrice = SellingPrice FROM Products WHERE ProductID = @productID;
 
 INSERT INTO TransactionItems (TransactionID, ProductID, Quantity)
-VALUES
-    (1, 1, 5),
-    (1, 2, 3),
-    (2, 3, 10);
+VALUES (@transactionID, @productID, @quantity);
+
+-- Update total cost
+SET @totalCost = @totalCost + (@sellingPrice * @quantity);
+
+                SET @j = @j + 1;
+END
+
+        -- Update the total cost in Transactions table
+UPDATE Transactions SET TotalCost = @totalCost WHERE TransactionID = @transactionID;
+
+SET @i = @i + 1;
+END
