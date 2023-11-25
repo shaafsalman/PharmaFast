@@ -6,7 +6,9 @@ import Helpers.GraphGenerator;
 import Helpers.UtilityFunctions;
 
 import javax.swing.*;
+import java.awt.*;
 import java.sql.SQLException;
+//final
 
 /**
  *
@@ -14,9 +16,10 @@ import java.sql.SQLException;
  */
 public class ManageGraphs extends javax.swing.JFrame {
 
-    GraphGenerator graphGenerator = new GraphGenerator();
-    UtilityFunctions uf = new UtilityFunctions();
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+    UtilityFunctions uf = new UtilityFunctions();
     JComboBox<String> yearComboBox = uf.createYearComboBox();
     JComboBox<String> monthComboBox = uf.createMonthComboBox();
     JComboBox<String> dayComboBox = uf.createDayComboBox();
@@ -26,6 +29,113 @@ public class ManageGraphs extends javax.swing.JFrame {
     public ManageGraphs() throws SQLException {
         initComponents();
     }
+    private void btnBack1ActionPerformed(java.awt.event.ActionEvent evt) throws SQLException {
+        // TODO add your handling code here:
+        this.dispose();
+        ManagerDashboard managerDashboard= new ManagerDashboard();
+        managerDashboard.setVisible(true);
+
+    }
+    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) throws SQLException {
+        // TODO add your handling code here:
+        this.dispose();
+        ManagerDashboard managerDashboard= new ManagerDashboard();
+        managerDashboard.setVisible(true);
+
+    }
+
+    private void btnMonthlyGraphActionPerformed(java.awt.event.ActionEvent evt) {
+        String selectedYear = (String) yearComboBox.getSelectedItem();
+        String selectedMonth = (String) monthComboBox.getSelectedItem();
+
+        if (selectedYear != null && selectedMonth != null) {
+            generateAndDisplayGraph("monthly", selectedYear + "-" + selectedMonth);
+        } else {
+            showErrorMessage("Please select a year and a month.");
+        }
+    }
+    private void btnYearlyGraphActionPerformed(java.awt.event.ActionEvent evt) {
+        String selectedYear = (String) yearComboBox.getSelectedItem();
+
+        if (selectedYear != null) {
+            generateAndDisplayGraph("yearly", selectedYear);
+        } else {
+            showErrorMessage("Please select a year.");
+        }
+    }
+    private void btnDailyGraphActionPerformed(java.awt.event.ActionEvent evt) {
+        if (areComboBoxesPopulated(yearComboBox, monthComboBox, dayComboBox)) {
+            String selectedYear = (String) yearComboBox.getSelectedItem();
+            String selectedMonth = (String) monthComboBox.getSelectedItem();
+            String selectedDay = (String) dayComboBox.getSelectedItem();
+
+            if (selectedYear != null && selectedMonth != null && selectedDay != null) {
+                generateAndDisplayGraph("daily", selectedYear + "-" + selectedMonth + "-" + selectedDay);
+            } else {
+                showErrorMessage("Please select a valid year, month, and day.");
+            }
+        } else {
+            showErrorMessage("Please ensure the combo boxes are populated.");
+        }
+    }
+    private void generateAndDisplayGraph(String reportType, String date) {
+        Object[] message = {
+                "Select a date:",
+                "Year:", yearComboBox,
+                "Month:", monthComboBox,
+                "Day:", dayComboBox
+        };
+
+        int option = JOptionPane.showConfirmDialog(null, message, getDialogTitle(reportType), JOptionPane.OK_CANCEL_OPTION);
+
+        if (option == JOptionPane.OK_OPTION) {
+            String filePath = GraphGenerator.generateGraph(reportType, date);
+
+            if (!filePath.isEmpty()) {
+                uf.displayGraph(filePath);
+            } else {
+                showErrorMessage("Graph generation failed.");
+            }
+        }
+    }
+    private String getDialogTitle(String reportType) {
+        switch (reportType) {
+            case "monthly":
+                return "Monthly Graph";
+            case "yearly":
+                return "Yearly Graph";
+            case "daily":
+                return "Daily Graph";
+            default:
+                throw new IllegalArgumentException("Invalid report type: " + reportType);
+        }
+    }
+    private void showErrorMessage(String message) {
+        JOptionPane.showMessageDialog(null, message);
+    }
+    private boolean areComboBoxesPopulated(JComboBox<?>... comboBoxes) {
+        for (JComboBox<?> comboBox : comboBoxes) {
+            if (comboBox.getItemCount() == 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static void main(String[] args) {
+
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    new ManageGraphs().setVisible(true);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+    }
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 
     @SuppressWarnings("unchecked")
@@ -228,10 +338,10 @@ public class ManageGraphs extends javax.swing.JFrame {
         btnAnumGraph.setBackground(new java.awt.Color(0, 153, 204));
         btnAnumGraph.setFont(new java.awt.Font("Century Gothic", 1, 14)); // NOI18N
         btnAnumGraph.setForeground(new java.awt.Color(255, 255, 255));
-        btnAnumGraph.setText("Generate Anum Based Graph");
+        btnAnumGraph.setText("Generate Yearly Based Graph");
         btnAnumGraph.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnAnumGraphActionPerformed(evt);
+                btnYearlyGraphActionPerformed(evt);
             }
         });
 
@@ -273,123 +383,11 @@ public class ManageGraphs extends javax.swing.JFrame {
         );
 
         pack();
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int x = (screenSize.width - getWidth()) / 2;
+        int y = (screenSize.height - getHeight()) / 2;
+        setLocation(x, y);
     }// </editor-fold>
-
-    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) throws SQLException {
-        // TODO add your handling code here:
-        this.dispose();
-        ManagerDashboard managerDashboard= new ManagerDashboard();
-        managerDashboard.setVisible(true);
-
-    }
-
-    private void btnBack1ActionPerformed(java.awt.event.ActionEvent evt) throws SQLException {
-        // TODO add your handling code here:
-        this.dispose();
-        ManagerDashboard managerDashboard= new ManagerDashboard();
-        managerDashboard.setVisible(true);
-
-    }
-
-
-
-    private void btnMonthlyGraphActionPerformed(java.awt.event.ActionEvent evt) {
-        String selectedYear = (String) yearComboBox.getSelectedItem();
-        String selectedMonth = (String) monthComboBox.getSelectedItem();
-
-        if (selectedYear != null && selectedMonth != null) {
-            String date = selectedYear + "-" + selectedMonth;
-
-            Object[] message = {
-                    "Select a date:",
-                    yearComboBox,
-                    monthComboBox
-            };
-
-            int option = JOptionPane.showConfirmDialog(null, message, "Monthly Graph", JOptionPane.OK_CANCEL_OPTION);
-            if (option == JOptionPane.OK_OPTION) {
-                String filePath = GraphGenerator.generateGraph("monthly", date);
-                if (filePath != null && !filePath.isEmpty()) {
-                    uf.displayGraph(filePath);
-                } else {
-                    JOptionPane.showMessageDialog(null, "Graph generation failed.");
-                }
-            }
-        } else {
-            JOptionPane.showMessageDialog(null, "Please select a year and a month.");
-        }
-    }
-
-    private void btnAnumGraphActionPerformed(java.awt.event.ActionEvent evt) {
-        String selectedYear = (String) yearComboBox.getSelectedItem();
-
-        if (selectedYear != null) {
-            Object[] message = {
-                    "Select a year:",
-                    yearComboBox
-            };
-
-            int option = JOptionPane.showConfirmDialog(null, message, "Yearly Graph", JOptionPane.OK_CANCEL_OPTION);
-            if (option == JOptionPane.OK_OPTION) {
-                String filePath = GraphGenerator.generateGraph("yearly", selectedYear);
-                System.out.println(filePath);
-                if (filePath != null && !filePath.isEmpty()) {
-                    uf.displayGraph(filePath);
-                } else {
-                    JOptionPane.showMessageDialog(null, "Graph generation failed.");
-                }
-            }
-        } else {
-            JOptionPane.showMessageDialog(null, "Please select a year.");
-        }
-    }
-
-    private void btnDailyGraphActionPerformed(java.awt.event.ActionEvent evt) {
-        if (yearComboBox.getItemCount() > 0 && monthComboBox.getItemCount() > 0 && dayComboBox.getItemCount() > 0) {
-            Object[] message = {
-                    "Select a date:",
-                    "Year:", yearComboBox,
-                    "Month:", monthComboBox,
-                    "Day:", dayComboBox
-            };
-
-            int option = JOptionPane.showConfirmDialog(null, message, "Daily Graph", JOptionPane.OK_CANCEL_OPTION);
-            if (option == JOptionPane.OK_OPTION) {
-                String selectedYear = (String) yearComboBox.getSelectedItem();
-                String selectedMonth = (String) monthComboBox.getSelectedItem();
-                String selectedDay = (String) dayComboBox.getSelectedItem();
-
-                if (selectedYear != null && selectedMonth != null && selectedDay != null) {
-                    String date = selectedYear + "-" + selectedMonth + "-" + selectedDay;
-
-                    String filePath = GraphGenerator.generateGraph("daily", date);
-                    if (filePath != null && !filePath.isEmpty()) {
-                        uf.displayGraph(filePath);
-                    } else {
-                        JOptionPane.showMessageDialog(null, "Graph generation failed.");
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(null, "Please select a valid year, month, and day.");
-                }
-            }
-        } else {
-            JOptionPane.showMessageDialog(null, "Please ensure the combo boxes are populated.");
-        }
-    }
-
-
-    public static void main(String args[]) {
-
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    new ManageGraphs().setVisible(true);
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
-    }
 
     private javax.swing.JButton btnAdd;
     private javax.swing.JButton btnAnumGraph;

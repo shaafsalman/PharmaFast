@@ -1,0 +1,10 @@
+Panadol Extra,Pain Relief,100,  Restock order
+Painkiller B,Pain Relief,200,  Restock order
+Atorvastatin,Pain Relief,300,  Restock order
+Diazepam,Pain Relief,500,  Restock order
+Clonazepam,Pain-Killers,600,  Restock order
+Panadol Extra,Pain Relief,100,  Restock order
+Painkiller B,Pain Relief,200,  Restock order
+Panadol Extra,Pain Relief,100,  Restock order
+Panadol Extra,Pain Relief,100,  Restock order
+Painkiller B,Pain Relief,200,  Restock order

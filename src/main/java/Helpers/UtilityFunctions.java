@@ -98,7 +98,7 @@ public class UtilityFunctions {
             return false;
         }
     }
-    public void displayReport(String filePath) {
+    public static void displayReport(String filePath) {
         if (filePath != null && !filePath.isEmpty()) {
             File reportFile = new File(filePath);
 
@@ -115,7 +115,7 @@ public class UtilityFunctions {
             JOptionPane.showMessageDialog(null, "No report file generated.");
         }
     }
-    public static boolean placeRestockOrder(String productName, String category, int currentQuantity, int newQuantity) {
+    public static String placeRestockOrder(String productName, String category, int currentQuantity, int newQuantity) {
         LocalDate today = LocalDate.now();
         String filePath = "src/main/resources/StockRequests";
         File fileDirectory = new File(filePath);
@@ -125,18 +125,18 @@ public class UtilityFunctions {
         }
 
         String fileName = "StockRequest_" + today + ".txt";
-        String orderDetails = productName + " (" + category + "): Restock order - " + newQuantity + " Requested on " + today;
+        String orderDetails = productName +","+category +","+  newQuantity+","+"  Restock order";
 
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(filePath + File.separator + fileName, true)); // Append mode
             writer.write(orderDetails);
             writer.newLine();
             writer.close();
-            return true;
+            return filePath + File.separator + fileName;
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return false;
+        return "-1";
     }
     public static void initializeUForTable(JTable table) {
 

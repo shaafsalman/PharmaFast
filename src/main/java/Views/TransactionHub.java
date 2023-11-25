@@ -25,16 +25,10 @@ import java.sql.Timestamp;
  */
 public class TransactionHub extends javax.swing.JFrame {
 
-
+//////////////////////////////////////////////////////////////////////////////////////
     CashierController csController = new CashierController();
-    AdminController adminController = new AdminController();
-    UtilityFunctions uFunctions = new UtilityFunctions();
     ReportGenerator reportGenerator = new ReportGenerator();
-    SessionManager sessionManager = new SessionManager();
-    TransactionDao transactionDao = new TransactionDao();
-    TransactionItemDao transactionItemDao = new TransactionItemDao();
-    
-
+    boolean Payment = false;
 
 
     public TransactionHub() throws SQLException {
@@ -51,8 +45,8 @@ public class TransactionHub extends javax.swing.JFrame {
             public void actionPerformed(ActionEvent e) {
                 String enteredProductID = txtBarcode.getText();
                 if (csController.productExists(enteredProductID)) {
-                    int quantity = askForQuantity();
-                    if (quantity > 0 && isQuantityAvailable(enteredProductID, quantity)) {
+                    int quantity = csController.askForQuantity();
+                    if (quantity > 0 && csController.isQuantityAvailable(enteredProductID, quantity)) {
                         addRowToTable(enteredProductID, quantity);
                     }
                     else {
@@ -112,22 +106,9 @@ public class TransactionHub extends javax.swing.JFrame {
             }
         });
     }
-    private int askForQuantity() {
-        String input = JOptionPane.showInputDialog("Enter quantity:");
-        try {
-            return Integer.parseInt(input);
-        } catch (NumberFormatException e) {
-            return 0;
-        }
-    }
-    private boolean isQuantityAvailable(String productID, int quantity)
-    {
-        return csController.isQuantityAvailable(productID, quantity);
-    }
     private void addRowToTable(String productID, int quantity) {
         DefaultTableModel model = (DefaultTableModel) tblCart.getModel();
         boolean isAlreadyInCart = false;
-
         for (int i = 0; i < model.getRowCount(); i++) {
             String cartProductID = model.getValueAt(i, 0).toString();
             if (cartProductID.equals(productID)) {
@@ -148,7 +129,6 @@ public class TransactionHub extends javax.swing.JFrame {
                 break;
             }
         }
-
         if (!isAlreadyInCart) {
             int availableQuantity = csController.getAvailableQuantity(productID);
             if (quantity <= availableQuantity) {
@@ -162,83 +142,23 @@ public class TransactionHub extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(null, "Available quantity is " + availableQuantity);
             }
         }
-
-
         float subtotal = 0;
         for (int i = 0; i < model.getRowCount(); i++) {
             double rowTotal = (double) model.getValueAt(i, 5);
-            subtotal += rowTotal;
+            subtotal += (float) rowTotal;
         }
         txtSubTotal.setText(String.valueOf(subtotal));
-
-
         txtVat.setText(String.valueOf(csController.VAT));
-
         float total = subtotal+((csController.VAT/100) * subtotal);
         txtTotalAmount.setText(String.valueOf(total));
-
-    }
-    private void txtBarcodeActionPerformed(java.awt.event.ActionEvent evt) {
     }
     private void btnProcessActionPerformed(java.awt.event.ActionEvent evt) {
-        String total = txtTotalAmount.getText();
-        String subTotal = txtSubTotal.getText();
-        String vat = txtVat.getText();
-        String paidAmount = txtAmountTender.getText();
-        String change = txtChange.getText();
-
-        String pdfFilePath = reportGenerator.generateReceipt(tblCart, total, subTotal, vat, paidAmount, change);
-        uFunctions.displayReport(pdfFilePath);
+        Process();
     }
-    private void btnVoidF10ActionPerformed(java.awt.event.ActionEvent evt) {
-        clearAll();
-    }
-    private void btnQtyF2ActionPerformed(java.awt.event.ActionEvent evt) {
-
-    }
-    private void btnNewF4ActionPerformed(java.awt.event.ActionEvent evt) {
-
-    }
-    private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {
-        dispose();
-    }
-    private void btnTenderF3ActionPerformed(java.awt.event.ActionEvent evt) {
-        handlePayment();
-    }
-
-
-    private void saveTransactions() {
-        Transaction transaction = new Transaction();
-        transaction.setUserID(sessionManager.getUserID());
-        transaction.setTotalCost(Double.parseDouble(txtTotalAmount.getText()));
-        transaction.setTransactionDate(new Timestamp(System.currentTimeMillis()));
-
-        if(transactionDao.addTransaction(transaction))
-        {
-            System.out.println("transaction added "+transaction.getTransactionID() );
-        }
-        int transactionID = transaction.getTransactionID();
-
-
-        DefaultTableModel model = (DefaultTableModel) tblCart.getModel();
-        for (int i = 0; i < model.getRowCount(); i++) {
-            TransactionItem transactionItem = new TransactionItem();
-            transactionItem.setTransactionID(transactionID);
-            transactionItem.setProductID(Integer.parseInt(model.getValueAt(i, 0).toString()));
-            transactionItem.setQuantity((int) model.getValueAt(i, 4));
-
-            if(transactionItemDao.addTransactionItem(transactionItem))
-            {
-                System.out.println("transaction item "+transactionItem.getProductID() );
-            }
-
-        }
-
-        System.out.println("Transactions saved successfully");
-    }
-
-
-
+    private void btnNewF4ActionPerformed(java.awt.event.ActionEvent evt) {Process();}
+    private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {dispose();}
+    private void btnTenderF3ActionPerformed(java.awt.event.ActionEvent evt) {handlePayment();}
+    private void btnVoidF10ActionPerformed(java.awt.event.ActionEvent evt) {clearAll();}
     private void handlePayment() {
         double totalAmount = Double.parseDouble(txtTotalAmount.getText());
 
@@ -251,8 +171,8 @@ public class TransactionHub extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(null, "Payment successful. Change: " + change);
                 txtChange.setText(String.valueOf(change));
                 txtAmountTender.setText(String.valueOf(paidAmount));
-                saveTransactions();
-
+                csController.saveTransactions(tblCart,txtTotalAmount.getText());
+                Payment = true;
             } else {
                 JOptionPane.showMessageDialog(null, "Insufficient payment. The paid amount is less than the total amount.");
             }
@@ -260,13 +180,39 @@ public class TransactionHub extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Invalid input. Please enter a valid numeric amount.");
         }
     }
+    private void Process() {
+
+        if (Payment)
+        {
+            String total = txtTotalAmount.getText();
+            String subTotal = txtSubTotal.getText();
+            String vat = txtVat.getText();
+            String paidAmount = txtAmountTender.getText();
+            String change = txtChange.getText();
+
+            String pdfFilePath = reportGenerator.generateReceipt(tblCart, total, subTotal, vat, paidAmount, change);
+            UtilityFunctions.displayReport(pdfFilePath);
+
+        }
+        else
+        {
+            JOptionPane.showMessageDialog(this,"Please Pay First");
+
+        }
+
+    }
+ ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
     void optimizTable(JTable table) {
         table.setRowHeight(40);
 
         table.setOpaque(false);
         table.setShowGrid(false);
         table.setBackground(new Color(255, 255, 255));
-        table.setSelectionBackground(new Color(52, 52, 52));
+
+        // Set the selection background to light gray
+        table.setSelectionBackground(new Color(220, 220, 220));
 
         class HeaderRenderer extends DefaultTableCellRenderer {
             public HeaderRenderer() {
@@ -293,10 +239,14 @@ public class TransactionHub extends javax.swing.JFrame {
         table.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
         table.getColumnModel().getColumn(4).setCellRenderer(centerRenderer);
         table.getColumnModel().getColumn(5).setCellRenderer(centerRenderer);
-
     }
 
 
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">
     private void initComponents() {
@@ -315,12 +265,10 @@ public class TransactionHub extends javax.swing.JFrame {
         leftPannel = new javax.swing.JPanel();
         btnProcess = new javax.swing.JButton();
         btnVoidF10 = new javax.swing.JButton();
-        btnQtyF2 = new javax.swing.JButton();
         lblVoid = new javax.swing.JLabel();
         lblTender = new javax.swing.JLabel();
         lblNew = new javax.swing.JLabel();
         lblClose = new javax.swing.JLabel();
-        lblQTY = new javax.swing.JLabel();
         lblSubTotal = new javax.swing.JLabel();
         lblSummary = new javax.swing.JLabel();
         lblVat = new javax.swing.JLabel();
@@ -352,7 +300,8 @@ public class TransactionHub extends javax.swing.JFrame {
 
         txtUserName.setFont(new java.awt.Font("Century Gothic", 0, 18)); // NOI18N
         txtUserName.setForeground(new java.awt.Color(255, 255, 255));
-        adminController.setUser(txtUserName);
+        txtUserName.setText("Shaaf Salman");
+
         btnBack.setBackground(new java.awt.Color(102, 102, 102));
         btnBack.setIcon(new javax.swing.ImageIcon(("src/main/resources/Material/left-chevron.png"))); // NOI18N
 
@@ -362,10 +311,10 @@ public class TransactionHub extends javax.swing.JFrame {
                 pnlTittleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlTittleLayout.createSequentialGroup()
                                 .addGap(19, 19, 19)
-                                .addComponent(btnBack, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(btnBack, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtTittle)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 492, Short.MAX_VALUE)
+                                .addComponent(txtTittle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGap(457, 457, 457)
                                 .addComponent(txtUserName)
                                 .addGap(15, 15, 15)
                                 .addComponent(picProfile)
@@ -374,16 +323,20 @@ public class TransactionHub extends javax.swing.JFrame {
         pnlTittleLayout.setVerticalGroup(
                 pnlTittleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlTittleLayout.createSequentialGroup()
-                                .addContainerGap(25, Short.MAX_VALUE)
+                                .addGap(25, 25, 25)
                                 .addGroup(pnlTittleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(txtUserName)
-                                        .addComponent(txtTittle)
-                                        .addComponent(btnBack))
+                                        .addGroup(pnlTittleLayout.createSequentialGroup()
+                                                .addComponent(txtUserName, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .addGap(16, 16, 16))
+                                        .addGroup(pnlTittleLayout.createSequentialGroup()
+                                                .addComponent(txtTittle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .addGap(8, 8, 8))
+                                        .addComponent(btnBack, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                 .addGap(22, 22, 22))
                         .addGroup(pnlTittleLayout.createSequentialGroup()
                                 .addContainerGap()
-                                .addComponent(picProfile)
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addComponent(picProfile, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGap(16, 16, 16))
         );
 
         txtBarcode.setFont(new java.awt.Font("Century Gothic", 0, 14)); // NOI18N
@@ -419,14 +372,6 @@ public class TransactionHub extends javax.swing.JFrame {
             }
         });
 
-        btnQtyF2.setFont(new java.awt.Font("Century Gothic", 1, 18)); // NOI18N
-        btnQtyF2.setText("F2");
-        btnQtyF2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnQtyF2ActionPerformed(evt);
-            }
-        });
-
         lblVoid.setBackground(new java.awt.Color(204, 204, 204));
         lblVoid.setFont(new java.awt.Font("Century Gothic", 1, 14)); // NOI18N
         lblVoid.setForeground(new java.awt.Color(51, 51, 51));
@@ -440,17 +385,12 @@ public class TransactionHub extends javax.swing.JFrame {
         lblNew.setBackground(new java.awt.Color(204, 204, 204));
         lblNew.setFont(new java.awt.Font("Century Gothic", 1, 14)); // NOI18N
         lblNew.setForeground(new java.awt.Color(51, 51, 51));
-        lblNew.setText("New");
+        lblNew.setText("Process");
 
         lblClose.setBackground(new java.awt.Color(204, 204, 204));
         lblClose.setFont(new java.awt.Font("Century Gothic", 1, 14)); // NOI18N
         lblClose.setForeground(new java.awt.Color(51, 51, 51));
         lblClose.setText("Close");
-
-        lblQTY.setBackground(new java.awt.Color(204, 204, 204));
-        lblQTY.setFont(new java.awt.Font("Century Gothic", 1, 14)); // NOI18N
-        lblQTY.setForeground(new java.awt.Color(51, 51, 51));
-        lblQTY.setText("Qty");
 
         lblSubTotal.setBackground(new java.awt.Color(204, 204, 204));
         lblSubTotal.setFont(new java.awt.Font("Century Gothic", 1, 14)); // NOI18N
@@ -478,7 +418,7 @@ public class TransactionHub extends javax.swing.JFrame {
         lblAmountTendered.setText("Amount Tendered");
 
         btnNewF4.setFont(new java.awt.Font("Century Gothic", 1, 18)); // NOI18N
-        btnNewF4.setText("F4");
+        btnNewF4.setText("F2");
         btnNewF4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnNewF4ActionPerformed(evt);
@@ -501,6 +441,8 @@ public class TransactionHub extends javax.swing.JFrame {
         txtVat.setFont(new java.awt.Font("Century Gothic", 0, 14)); // NOI18N
 
         txtSubTotal.setFont(new java.awt.Font("Century Gothic", 0, 14)); // NOI18N
+        txtSubTotal.setToolTipText("");
+        txtSubTotal.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
 
         txtTotalAmount.setFont(new java.awt.Font("Century Gothic", 0, 14)); // NOI18N
 
@@ -525,62 +467,62 @@ public class TransactionHub extends javax.swing.JFrame {
         leftPannel.setLayout(leftPannelLayout);
         leftPannelLayout.setHorizontalGroup(
                 leftPannelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, leftPannelLayout.createSequentialGroup()
-                                .addGap(0, 0, Short.MAX_VALUE)
-                                .addComponent(lblSummary)
-                                .addGap(125, 125, 125))
                         .addGroup(leftPannelLayout.createSequentialGroup()
-                                .addContainerGap()
                                 .addGroup(leftPannelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                         .addGroup(leftPannelLayout.createSequentialGroup()
-                                                .addComponent(lblSubTotal)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                .addComponent(txtSubTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                        .addGroup(leftPannelLayout.createSequentialGroup()
+                                                .addContainerGap()
                                                 .addGroup(leftPannelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(lblAmountTendered)
-                                                        .addComponent(lblTotalAmount)
-                                                        .addComponent(lblVat)
-                                                        .addComponent(lblChange))
+                                                        .addGroup(leftPannelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                                .addGroup(leftPannelLayout.createSequentialGroup()
+                                                                        .addGroup(leftPannelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                                .addComponent(lblAmountTendered)
+                                                                                .addComponent(lblTotalAmount)
+                                                                                .addComponent(lblVat)
+                                                                                .addComponent(lblChange))
+                                                                        .addGap(18, 18, 18)
+                                                                        .addGroup(leftPannelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                                                                .addComponent(txtAmountTender, javax.swing.GroupLayout.Alignment.LEADING)
+                                                                                .addComponent(txtTotalAmount, javax.swing.GroupLayout.Alignment.LEADING)
+                                                                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, leftPannelLayout.createSequentialGroup()
+                                                                                        .addComponent(txtVat, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                                        .addComponent(lblVat1, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                                                .addComponent(txtChange)))
+                                                                .addComponent(txtSubTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                        .addComponent(lblSubTotal)))
+                                        .addGroup(leftPannelLayout.createSequentialGroup()
                                                 .addGap(18, 18, 18)
                                                 .addGroup(leftPannelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(txtChange)
-                                                        .addGroup(leftPannelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                                                .addComponent(txtTotalAmount, javax.swing.GroupLayout.Alignment.LEADING)
-                                                                .addComponent(txtAmountTender, javax.swing.GroupLayout.DEFAULT_SIZE, 211, Short.MAX_VALUE)
-                                                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, leftPannelLayout.createSequentialGroup()
-                                                                        .addComponent(txtVat, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                                        .addComponent(lblVat1, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))))))
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, leftPannelLayout.createSequentialGroup()
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(btnProcess, javax.swing.GroupLayout.PREFERRED_SIZE, 321, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(17, 17, 17))
-                        .addGroup(leftPannelLayout.createSequentialGroup()
-                                .addGap(18, 18, 18)
-                                .addComponent(btnTenderF3, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnVoidF10, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnQtyF2, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnNewF4, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnClose, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, leftPannelLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(lblTender, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(lblVoid)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(lblQTY)
-                                .addGap(44, 44, 44)
-                                .addComponent(lblNew)
-                                .addGap(38, 38, 38)
-                                .addComponent(lblClose)
-                                .addGap(24, 24, 24))
+                                                        .addGroup(leftPannelLayout.createSequentialGroup()
+                                                                .addGap(6, 6, 6)
+                                                                .addComponent(lblTender, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addGroup(leftPannelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                        .addGroup(leftPannelLayout.createSequentialGroup()
+                                                                                .addGap(53, 53, 53)
+                                                                                .addComponent(lblSummary))
+                                                                        .addGroup(leftPannelLayout.createSequentialGroup()
+                                                                                .addGap(36, 36, 36)
+                                                                                .addComponent(lblVoid))))
+                                                        .addGroup(leftPannelLayout.createSequentialGroup()
+                                                                .addComponent(btnTenderF3, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addGap(18, 18, 18)
+                                                                .addComponent(btnVoidF10, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addGap(18, 18, 18)
+                                                                .addGroup(leftPannelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                        .addGroup(leftPannelLayout.createSequentialGroup()
+                                                                                .addComponent(btnNewF4, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                                .addGap(18, 18, 18)
+                                                                                .addComponent(btnClose, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                                        .addGroup(leftPannelLayout.createSequentialGroup()
+                                                                                .addGap(6, 6, 6)
+                                                                                .addComponent(lblNew)
+                                                                                .addGap(40, 40, 40)
+                                                                                .addComponent(lblClose, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE))))))
+                                        .addGroup(leftPannelLayout.createSequentialGroup()
+                                                .addGap(66, 66, 66)
+                                                .addComponent(btnProcess, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .addGap(22, 22, 22)))
+                                .addGap(12, 12, 12))
         );
         leftPannelLayout.setVerticalGroup(
                 leftPannelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -588,7 +530,6 @@ public class TransactionHub extends javax.swing.JFrame {
                                 .addContainerGap()
                                 .addGroup(leftPannelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(btnVoidF10, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(btnQtyF2, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addComponent(btnNewF4, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addComponent(btnClose, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addComponent(btnTenderF3, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -597,11 +538,10 @@ public class TransactionHub extends javax.swing.JFrame {
                                         .addComponent(lblTender)
                                         .addComponent(lblClose)
                                         .addComponent(lblNew)
-                                        .addComponent(lblQTY)
                                         .addComponent(lblVoid))
-                                .addGap(18, 18, 18)
+                                .addGap(30, 30, 30)
                                 .addComponent(lblSummary)
-                                .addGap(38, 38, 38)
+                                .addGap(26, 26, 26)
                                 .addGroup(leftPannelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(lblSubTotal)
                                         .addComponent(txtSubTotal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -622,9 +562,9 @@ public class TransactionHub extends javax.swing.JFrame {
                                 .addGroup(leftPannelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(lblChange)
                                         .addComponent(txtChange, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 34, Short.MAX_VALUE)
+                                .addGap(39, 39, 39)
                                 .addComponent(btnProcess)
-                                .addGap(24, 24, 24))
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -637,15 +577,17 @@ public class TransactionHub extends javax.swing.JFrame {
                                         .addComponent(pnlTittle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addGroup(layout.createSequentialGroup()
                                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                                                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 568, Short.MAX_VALUE)
-                                                                .addComponent(txtBarcode)
-                                                                .addGroup(layout.createSequentialGroup()
-                                                                        .addGap(165, 165, 165)
-                                                                        .addComponent(lblTransactionID, javax.swing.GroupLayout.PREFERRED_SIZE, 209, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                                        .addComponent(lblBarcode))
+                                                        .addComponent(jScrollPane1)
+                                                        .addComponent(txtBarcode)
+                                                        .addGroup(layout.createSequentialGroup()
+                                                                .addGap(165, 165, 165)
+                                                                .addComponent(lblTransactionID, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                                .addGap(194, 194, 194))
+                                                        .addGroup(layout.createSequentialGroup()
+                                                                .addComponent(lblBarcode, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                                .addGap(509, 509, 509)))
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(leftPannel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .addComponent(leftPannel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                 .addContainerGap())
                                         .addComponent(jProgressBar1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
@@ -653,30 +595,24 @@ public class TransactionHub extends javax.swing.JFrame {
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addContainerGap()
-                                .addComponent(pnlTittle, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(pnlTittle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                         .addGroup(layout.createSequentialGroup()
                                                 .addGap(15, 15, 15)
-                                                .addComponent(lblTransactionID, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(lblTransactionID, javax.swing.GroupLayout.DEFAULT_SIZE, 39, Short.MAX_VALUE)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(lblBarcode)
+                                                .addComponent(lblBarcode, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(txtBarcode, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(txtBarcode, javax.swing.GroupLayout.DEFAULT_SIZE, 27, Short.MAX_VALUE)
                                                 .addGap(18, 18, 18)
-                                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                                                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 375, Short.MAX_VALUE))
                                         .addGroup(layout.createSequentialGroup()
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                                 .addComponent(leftPannel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                                 .addContainerGap())
         );
-        txtBarcode.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtBarcodeActionPerformed(evt);
-            }
-        });
-
 
         pack();
     }// </editor-fold>
@@ -713,7 +649,7 @@ public class TransactionHub extends javax.swing.JFrame {
     private javax.swing.JButton btnClose;
     private javax.swing.JButton btnNewF4;
     private javax.swing.JButton btnProcess;
-    private javax.swing.JButton btnQtyF2;
+
     private javax.swing.JButton btnTenderF3;
     private javax.swing.JButton btnVoidF10;
     private javax.swing.JProgressBar jProgressBar1;
@@ -723,7 +659,6 @@ public class TransactionHub extends javax.swing.JFrame {
     private javax.swing.JLabel lblChange;
     private javax.swing.JLabel lblClose;
     private javax.swing.JLabel lblNew;
-    private javax.swing.JLabel lblQTY;
     private javax.swing.JLabel lblSubTotal;
     private javax.swing.JLabel lblSummary;
     private javax.swing.JLabel lblTender;

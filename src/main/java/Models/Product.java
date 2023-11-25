@@ -56,4 +56,14 @@ public class Product {
     public void setExpiryDate(Date expiryDate) {
         this.expiryDate = expiryDate;
     }
+
+    public void setName(String name) {this.productName = name;}
+
+    public void setCostPrice(double costPrice) {this.costPrice = costPrice;}
+
+    public void setSellingPrice(double modifiedSellingPrice) {this.sellingPrice =sellingPrice;}
+
+    public void setQuantity(int modifiedQuantity) {this.quantity = quantity;}
+
+    public String getName() {return productName;}
 }

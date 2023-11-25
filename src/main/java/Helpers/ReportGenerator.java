@@ -7,7 +7,13 @@ import com.itextpdf.text.pdf.PdfWriter;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.io.BufferedReader;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.*;
 import java.time.LocalDate;
 
@@ -59,15 +65,12 @@ public class ReportGenerator {
                         "FROM Transactions " +
                         "WHERE CONVERT(DATE, TransactionDate) = ?";
 
-            }
-            else if (reportType.equals("monthly"))
-            {
+            } else if (reportType.equals("monthly")) {
                 sql = "SELECT TransactionID, UserID, TotalCost, TransactionDate " +
                         "FROM Transactions " +
                         "WHERE YEAR(TransactionDate) = ? AND MONTH(TransactionDate) = ?";
 
-            }
-            else if (reportType.equals("yearly")) {
+            } else if (reportType.equals("yearly")) {
                 sql = "SELECT TransactionID, UserID, TotalCost, TransactionDate " +
                         "FROM Transactions " +
                         "WHERE YEAR(TransactionDate) = YEAR(?)";
@@ -77,9 +80,7 @@ public class ReportGenerator {
 
             if (reportType.equals("daily")) {
                 statement.setString(1, date);
-            }
-            else if (reportType.equals("monthly"))
-            {
+            } else if (reportType.equals("monthly")) {
                 String[] parts = date.split("-");
                 String year = parts[0];
                 String month = parts[1];
@@ -88,9 +89,7 @@ public class ReportGenerator {
 
                 statement.setInt(1, Integer.parseInt(year));
                 statement.setInt(2, Integer.parseInt(month));
-            }
-            else if (reportType.equals("yearly"))
-            {
+            } else if (reportType.equals("yearly")) {
                 statement.setString(1, date);
             }
 
@@ -117,6 +116,7 @@ public class ReportGenerator {
         }
         return pdfOutputFile;
     }
+
     private static PdfPCell getHeaderCell(String content) {
         com.itextpdf.text.Font font = FontFactory.getFont("Century Gothic", 14, BaseColor.WHITE);
         PdfPCell cell = new PdfPCell(new Phrase(content, font));
@@ -124,11 +124,13 @@ public class ReportGenerator {
         cell.setHorizontalAlignment(Element.ALIGN_CENTER);
         return cell;
     }
+
     private static PdfPCell getCell(String content) {
         PdfPCell cell = new PdfPCell(new Phrase(content, FontFactory.getFont("Century Gothic", 12, BaseColor.BLACK)));
         cell.setHorizontalAlignment(Element.ALIGN_CENTER);
         return cell;
     }
+
     public String generateReceipt(JTable tableCart, String total, String subTotal, String vat, String paidAmount, String change) {
         LocalDate day = LocalDate.now();
         String pdfOutputFile = "src/main/resources/Recipts/Report_" + day + ".pdf";
@@ -202,5 +204,84 @@ public class ReportGenerator {
         }
         return pdfOutputFile;
     }
+
+    public static String generateStockRequest(String pathtoLogFile) {
+        String outputDirectory = "src/main/resources/StockRequestsOutputs";
+        LocalDate day = LocalDate.now();
+        String pdfOutputFile = outputDirectory + "/StockRequest_" + day + ".pdf";
+
+        try {
+            Path outputPath = Paths.get(outputDirectory);
+            if (Files.notExists(outputPath)) {
+                Files.createDirectories(outputPath);
+            }
+
+            Document document = new Document();
+            PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(pdfOutputFile));
+            document.open();
+
+            Image logo = Image.getInstance("src/main/resources/Material/apple-touch-icon.png");
+            logo.setAlignment(Element.ALIGN_CENTER);
+            logo.scaleAbsolute(45, 45);
+            document.add(logo);
+
+            Paragraph title = new Paragraph("Stock Request\n\n",
+                    FontFactory.getFont("Century Gothic", 18, BaseColor.BLACK));
+            title.setAlignment(Element.ALIGN_CENTER);
+            document.add(title);
+
+            // Add table for displaying main body data
+            PdfPTable dataTable = new PdfPTable(3);
+            dataTable.setWidthPercentage(100);
+
+            // Headers
+            dataTable.addCell(getHeaderCell("Product"));
+            dataTable.addCell(getHeaderCell("Category"));
+            dataTable.addCell(getHeaderCell("Quantity"));
+
+            // Read stock requests from a file and populate the table
+            try (BufferedReader br = new BufferedReader(new FileReader(pathtoLogFile))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    // Split the line based on commas
+                    String[] parts = line.trim().split("\\s*,\\s*");
+
+                    // Assuming the format is "Product,Category,Quantity,Restock order"
+                    if (parts.length == 4 && parts[3].equalsIgnoreCase("Restock order")) {
+                        String product = parts[0];
+                        String category = parts[1];
+                        String quantity = parts[2];
+
+                        // Add data to the table
+                        dataTable.addCell(getCell(product));
+                        dataTable.addCell(getCell(category));
+                        dataTable.addCell(getCell(quantity));
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            document.add(dataTable);
+
+            Paragraph footer = new Paragraph("\n\n\nRequest generated on: " + LocalDate.now(),
+                    FontFactory.getFont("Century Gothic", 12, BaseColor.BLACK));
+            footer.setAlignment(Element.ALIGN_CENTER);
+            document.add(footer);
+
+            document.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return pdfOutputFile;
+    }
+//    public static void main(String[] args) {
+//        String generatedFile = generateStockRequest("src/main/resources/StockRequests/StockRequest_2023-11-25.txt");
+//        System.out.println("Stock Request generated successfully: " + generatedFile);
+//     }
+
+
+
 
 }

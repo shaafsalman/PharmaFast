@@ -48,4 +48,9 @@ public class User {
         this.role = role;
     }
 
+    public void print() {
+        System.out.println(userID + " " + username + " " + password + " " + role);
+    }
+
+
 }

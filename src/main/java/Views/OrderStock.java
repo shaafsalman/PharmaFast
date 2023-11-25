@@ -2,10 +2,14 @@ package Views;
 
 
 import Controllers.AdminController;
+import Helpers.ReportGenerator;
 import Helpers.UtilityFunctions;
 
 import javax.swing.*;
+import java.awt.*;
 import java.sql.SQLException;
+
+//final
 
 /**
  *
@@ -13,8 +17,9 @@ import java.sql.SQLException;
  */
 public class OrderStock extends javax.swing.JFrame {
 
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     AdminController adminController = new AdminController();
-    UtilityFunctions uFunctions = new UtilityFunctions();
+
 
     public OrderStock() throws SQLException {
 
@@ -23,6 +28,71 @@ public class OrderStock extends javax.swing.JFrame {
         adminController.initializeDeadStockTable(tblDeadStock);
     }
 
+    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) throws SQLException {
+        // TODO add your handling code here:
+        this.dispose();
+        ManagerDashboard managerDashboard= new ManagerDashboard();
+        managerDashboard.setVisible(true);
+    }
+    private void btnReStockActionPerformed(java.awt.event.ActionEvent evt) {
+        JTable selectedTable = null;
+
+        if (tblStock.getSelectedRow() != -1) {
+            selectedTable = tblStock;
+        } else if (tblDeadStock.getSelectedRow() != -1) {
+            selectedTable = tblDeadStock;
+        } else
+        {
+            return;
+        }
+        int[] selectedRows = selectedTable.getSelectedRows();
+        String pdfPath = null;
+
+
+        for (int selectedRow : selectedRows) {
+            String productName = selectedTable.getValueAt(selectedRow, 0).toString();
+            String category = selectedTable.getValueAt(selectedRow, 1).toString();
+            int currentQuantity = Integer.parseInt(selectedTable.getValueAt(selectedRow, 2).toString());
+
+            String quantityInput = JOptionPane.showInputDialog("Enter the quantity to order for " + productName + " in " + category + ":");
+
+            if (quantityInput != null && !quantityInput.isEmpty()) {
+                try {
+                    int newQuantity = Integer.parseInt(quantityInput);
+                    String orderFilePath = UtilityFunctions.placeRestockOrder(productName, category, currentQuantity, newQuantity);
+
+                    if (!"-1".equals(orderFilePath)) {
+                        JOptionPane.showMessageDialog(this, "Order Placed Successfully");
+                        System.out.println("Stock Request generated successfully: " + orderFilePath);
+                        pdfPath = ReportGenerator.generateStockRequest(orderFilePath);
+
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Failed to place restock order.");
+                    }
+                } catch (NumberFormatException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        if(pdfPath!= null)
+        {
+            UtilityFunctions.displayReport(pdfPath);
+        }
+    }
+
+    public static void main(String args[]) {
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    new OrderStock().setVisible(true);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+    }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">
     private void initComponents() {
@@ -171,60 +241,11 @@ public class OrderStock extends javax.swing.JFrame {
             }
         });
         pack();
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int x = (screenSize.width - getWidth()) / 2;
+        int y = (screenSize.height - getHeight()) / 2;
+        setLocation(x, y);
     }// </editor-fold>
-
-    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) throws SQLException {
-        // TODO add your handling code here:
-        this.dispose();
-        ManagerDashboard managerDashboard= new ManagerDashboard();
-        managerDashboard.setVisible(true);
-    }
-
-    private void btnReStockActionPerformed(java.awt.event.ActionEvent evt) {
-        JTable selectedTable = null;
-
-        if (tblStock.getSelectedRow() != -1) {
-            selectedTable = tblStock;
-        } else if (tblDeadStock.getSelectedRow() != -1) {
-            selectedTable = tblDeadStock;
-        } else
-        {
-            return;
-        }
-        int[] selectedRows = selectedTable.getSelectedRows();
-
-        for (int selectedRow : selectedRows) {
-            String productName = selectedTable.getValueAt(selectedRow, 0).toString();
-            String category = selectedTable.getValueAt(selectedRow, 1).toString();
-            int currentQuantity = Integer.parseInt(selectedTable.getValueAt(selectedRow, 2).toString());
-
-            String quantityInput = JOptionPane.showInputDialog("Enter the quantity to order for " + productName + " in " + category + ":");
-
-            if (quantityInput != null && !quantityInput.isEmpty()) {
-                try {
-                    int newQuantity = Integer.parseInt(quantityInput);
-                    if(UtilityFunctions.placeRestockOrder(productName, category, currentQuantity, newQuantity))
-                    {
-                        JOptionPane.showMessageDialog(this,"Order Placed Successfully");
-                    }
-                } catch (NumberFormatException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    new OrderStock().setVisible(true);
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
-    }
 
     private javax.swing.JButton btnBack;
     private javax.swing.JButton btnReStock;

@@ -15,6 +15,8 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.io.*;
 import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,7 +37,7 @@ public class AdminController extends Component {
         this.uFunctions = new UtilityFunctions();
         this.userDao = new UserDao();
         this.sessionManager = new SessionManager();
-        this.adminConfig = new AdminConfig();
+        adminConfig = new AdminConfig();
         loadConfig();
     }
     public AdminController(CategoryDao categoryDao, ProductDao productDao) {
@@ -44,7 +46,7 @@ public class AdminController extends Component {
         this.uFunctions = new UtilityFunctions();
         this.userDao = new UserDao();
         this.sessionManager = new SessionManager();
-        this.adminConfig = new AdminConfig();
+        adminConfig = new AdminConfig();
         loadConfig();
     }
 
@@ -140,7 +142,10 @@ public class AdminController extends Component {
         }
         return productDao.updateProduct(product);
     }
-
+    public Product getProductByID(int productID)
+    {
+        return productDao.getProduct( productID);
+    }
     public boolean deleteProduct(int productId) {
         return productDao.deleteProduct(productId);
     }
@@ -330,20 +335,215 @@ public class AdminController extends Component {
     {
         userDao.addUser(newUser);
     }
-
-
-
-
-    public static void main(String[] args) {
-        //String yearlyReport = generateReport("yearly", "2023");
-        //String monthlyReport = generateReport("monthly", "2023-10");
-        //String dailyReport = generateReport("daily", "2023-10-15");
-
+    public boolean deleteUser(int userID) {return userDao.deleteUser(userID);}
+    public void setUser(JLabel usernameLabel)
+    {
+        usernameLabel.setText(sessionManager.getName());
+    }
+    public void setRole(JLabel lblUserRoles) {lblUserRoles.setText(sessionManager.getRole());
     }
 
 
-    public boolean deleteUser(int userID) {return userDao.deleteUser(userID);}
+    public void showDeleteUserDialog(Component parentComponent, JTable tblUsers, int selectedRow) {
+        if (selectedRow != -1) {
+            int userId = (int) tblUsers.getValueAt(selectedRow, 0);
+            String username = (String) tblUsers.getValueAt(selectedRow, 1);
+            int confirmation = JOptionPane.showConfirmDialog(
+                    parentComponent,  // Pass the parentComponent here
+                    "Are you sure you want to delete user '" + username + "'?",
+                    "Confirm Deletion",
+                    JOptionPane.YES_NO_OPTION
+            );
 
+            if (confirmation == JOptionPane.YES_OPTION) {
+                if (deleteUser(userId)) {
+                    initializeUsersTable(tblUsers);
+                    JOptionPane.showMessageDialog(parentComponent, "User '" + username + "' deleted successfully.");
+                } else {
+                    JOptionPane.showMessageDialog(parentComponent, "Failed to delete user '" + username + "'.");
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(parentComponent, "Please select a row to delete.");
+        }
+    }
+    public boolean showAddProductDialog() {
+        String productName = JOptionPane.showInputDialog(null, "Enter Product Name:");
+        double costPrice = 0.0;
+        double sellingPrice = 0.0;
+        int quantity = 0;
+
+        Map<Integer, String> categoryData = new HashMap<>();
+        boolean success = getCategoryData(categoryData);
+
+        if (!success) {
+            JOptionPane.showMessageDialog(null, "Failed to retrieve category data. Please try again later.");
+            return false;
+        }
+
+        JComboBox<String> categoryComboBox = new JComboBox<>(categoryData.values().toArray(new String[0]));
+        int result = JOptionPane.showConfirmDialog(null, categoryComboBox, "Select a Category", JOptionPane.OK_CANCEL_OPTION);
+
+        int categoryID = -1;
+        if (result == JOptionPane.OK_OPTION && categoryComboBox.getSelectedIndex() != -1) {
+            String selectedCategory = (String) categoryComboBox.getSelectedItem();
+
+            for (Map.Entry<Integer, String> entry : categoryData.entrySet()) {
+                if (entry.getValue().equals(selectedCategory)) {
+                    categoryID = entry.getKey();
+                    break;
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Category not selected. Please select a category.");
+            return false;
+        }
+
+        String inputCost = JOptionPane.showInputDialog(null, "Enter Cost Price (Skip to set default as 0.0):");
+        if (inputCost != null && !inputCost.isEmpty()) {
+            costPrice = Double.parseDouble(inputCost);
+        }
+
+        String inputSelling = JOptionPane.showInputDialog(null, "Enter Selling Price (Skip to set default as 0.0):");
+        if (inputSelling != null && !inputSelling.isEmpty()) {
+            sellingPrice = Double.parseDouble(inputSelling);
+        }
+
+        String inputQuantityStr = JOptionPane.showInputDialog(null, "Enter Quantity (Skip to set default as 0):");
+        if (inputQuantityStr != null && !inputQuantityStr.isEmpty()) {
+            quantity = Integer.parseInt(inputQuantityStr);
+        }
+
+        JComboBox<String> yearComboBox = uFunctions.createExpiryYearComboBox();
+        JComboBox<String> monthComboBox = uFunctions.createMonthComboBox();
+        JComboBox<String> dayComboBox = uFunctions.createDayComboBox();
+
+        JPanel expiryPanel = new JPanel();
+        expiryPanel.add(yearComboBox);
+        expiryPanel.add(monthComboBox);
+        expiryPanel.add(dayComboBox);
+
+        int expiryResult;
+        boolean validDate = false;
+        String selectedExpiryDate = null;
+
+        while (!validDate) {
+            expiryResult = JOptionPane.showConfirmDialog(null, expiryPanel, "Select Expiry Date", JOptionPane.OK_CANCEL_OPTION);
+
+            if (expiryResult == JOptionPane.OK_OPTION) {
+                String selectedYear = (String) yearComboBox.getSelectedItem();
+                String selectedMonth = (String) monthComboBox.getSelectedItem();
+                String selectedDay = (String) dayComboBox.getSelectedItem();
+
+                validDate = uFunctions.isValidDate(Integer.parseInt(selectedYear), Integer.parseInt(selectedMonth), Integer.parseInt(selectedDay));
+
+                if (!validDate) {
+                    JOptionPane.showMessageDialog(null, "Please enter a valid date.");
+                } else {
+                    selectedExpiryDate = selectedYear + "-" + selectedMonth + "-" + selectedDay;
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "Expiry date not selected. Please select a date.");
+                return false;
+            }
+        }
+
+        try {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            java.util.Date utilDate = dateFormat.parse(selectedExpiryDate);
+            java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
+
+            Product newProduct = new Product(0, productName, costPrice, sellingPrice, quantity,categoryID,sqlDate);
+
+            boolean addResult = addProduct(newProduct);
+
+            if (addResult) {
+                return true;
+            } else {
+                JOptionPane.showMessageDialog(null, "Failed to add product " + productName);
+                return false;
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error parsing the selected date.");
+            return false;
+        }
+    }
+    public boolean showModifyProductDialog(Product existingProduct) {
+        // Show existing values in input dialogs
+        String modifiedProductName = JOptionPane.showInputDialog(null, "Enter Product Name (Skip to keep existing):", existingProduct.getName());
+
+        if (modifiedProductName == null) {
+            // User clicked Cancel
+            return false;
+        }
+
+        double modifiedCostPrice = existingProduct.getCostPrice();
+        String inputCost = JOptionPane.showInputDialog(null, "Enter Cost Price (Skip to keep existing):", modifiedCostPrice);
+
+        double modifiedSellingPrice = existingProduct.getSellingPrice();
+        String inputSelling = JOptionPane.showInputDialog(null, "Enter Selling Price (Skip to keep existing):", modifiedSellingPrice);
+
+
+        int modifiedQuantity = existingProduct.getQuantity();
+        JSpinner quantitySpinner = new JSpinner(new SpinnerNumberModel(modifiedQuantity, 0, Integer.MAX_VALUE, 1));
+        quantitySpinner.setEditor(new JSpinner.NumberEditor(quantitySpinner, "#"));
+        int quantityDialogResult = JOptionPane.showOptionDialog(
+                null,
+                quantitySpinner,
+                "Enter Quantity",
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                null,
+                null
+        );
+
+        if (quantityDialogResult == JOptionPane.CANCEL_OPTION) {
+            // User clicked Cancel
+            return false;
+        }
+
+        if (inputCost != null && !inputCost.isEmpty()) {
+            modifiedCostPrice = Double.parseDouble(inputCost);
+            existingProduct.setCostPrice(modifiedCostPrice);
+        }
+
+        if (inputSelling != null && !inputSelling.isEmpty()) {
+            modifiedSellingPrice = Double.parseDouble(inputSelling);
+            existingProduct.setSellingPrice(modifiedSellingPrice);
+        }
+
+        existingProduct.setName(modifiedProductName);
+        existingProduct.setQuantity((int) quantitySpinner.getValue());
+
+        // Update the existing product
+        boolean updateResult = updateProduct(existingProduct);
+
+        if (updateResult) {
+            JOptionPane.showMessageDialog(null, "Product " + existingProduct.getName() + " details updated successfully.");
+            return true;
+        } else {
+            JOptionPane.showMessageDialog(null, "Failed to update product details for " + existingProduct.getName());
+            return false;
+        }
+    }
+    public boolean showDeleteProductDialog(int productID, String productName) {
+        int confirmResult = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete the product " + productName + "?");
+
+        if (confirmResult == JOptionPane.YES_OPTION) {
+            boolean deleteResult = deleteProduct(productID);
+
+            if (deleteResult) {
+                return true;
+            } else {
+                JOptionPane.showMessageDialog(null, "Failed to delete product " + productName);
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
     public void showModifyUserDialog(int userID) {
         User existingUser = userDao.getUser(userID);
 
@@ -393,15 +593,14 @@ public class AdminController extends Component {
         }
     }
 
+    public static void main(String[] args) {
+        //String yearlyReport = generateReport("yearly", "2023");
+        //String monthlyReport = generateReport("monthly", "2023-10");
+        //String dailyReport = generateReport("daily", "2023-10-15");
 
-
-    public void setUser(JLabel usernameLabel)
-    {
-        usernameLabel.setText(sessionManager.getName());
     }
 
-    public void setRole(JLabel lblUserRoles) {lblUserRoles.setText(sessionManager.getRole());
-    }
+
 }
 
 

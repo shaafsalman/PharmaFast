@@ -18,6 +18,32 @@ public class ProductDao {
             throw new RuntimeException(e);
         }
     }
+    public Product getProduct(int productID) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT * FROM Products WHERE ProductID = ?")) {
+
+            preparedStatement.setInt(1, productID);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    String productName = resultSet.getString("ProductName");
+                    double costPrice = resultSet.getDouble("Price");
+                    double sellingPrice = resultSet.getDouble("SellingPrice");
+                    int quantity = resultSet.getInt("Quantity");
+                    int categoryID = resultSet.getInt("CategoryID");
+                    Date expiryDate = resultSet.getDate("ExpiryDate");
+
+                    return new Product(productID, productName, costPrice, sellingPrice, quantity, categoryID, expiryDate);
+                } else {
+                    // No product found with the given ID
+                    return null;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
     public boolean addProduct(Product product) {
         try (PreparedStatement preparedStatement = connection.prepareStatement(
                 "INSERT INTO Products (ProductName, Price, SellingPrice, Quantity, CategoryID, ExpiryDate) VALUES (?, ?, ?, ?, ?, ?)")) {
@@ -226,7 +252,6 @@ public class ProductDao {
         }
         return false;
     }
-
     public int getAvailableQuantity(String productID) {
         String query = "SELECT Quantity FROM Products WHERE ProductID = ?";
         int availableQuantity = 0;
@@ -242,5 +267,6 @@ public class ProductDao {
         }
         return availableQuantity;
     }
+
 
 }

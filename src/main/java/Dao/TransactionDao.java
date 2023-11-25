@@ -56,14 +56,14 @@ public class TransactionDao {
         String sql = "SELECT MONTH(t.TransactionDate) AS Month, " +
                 "SUM(p.Price * ti.Quantity) AS TotalCostPrice, " +
                 "SUM(p.SellingPrice * ti.Quantity) AS TotalSellingPrice, " +
-                "MIN(t.TransactionDate) AS FirstTransactionDate " + // The first transaction date of the month
+                "MIN(t.TransactionDate) AS FirstTransactionDate " +
                 "FROM TransactionItems ti " +
                 "JOIN Transactions t ON ti.TransactionID = t.TransactionID " +
                 "JOIN Products p ON ti.ProductID = p.ProductID " +
                 "WHERE YEAR(t.TransactionDate) = ? " +
                 "GROUP BY MONTH(t.TransactionDate)";
         PreparedStatement statement = connection.prepareStatement(sql);
-        statement.setInt(1, Integer.parseInt(year)); // Year for the report
+        statement.setInt(1, Integer.parseInt(year));
         return statement;
     }
 

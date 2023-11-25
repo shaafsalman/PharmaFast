@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.sql.SQLException;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -12,11 +14,11 @@ class CashierControllerTest {
 
     @Mock
     private ProductDao productDao;
-
     private CashierController cashierController;
 
+
     @BeforeEach
-    void setUp() {
+    void setUp() throws SQLException {
         MockitoAnnotations.initMocks(this);
         cashierController = new CashierController(productDao);
     }

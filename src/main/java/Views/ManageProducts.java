@@ -6,11 +6,14 @@ import Helpers.UtilityFunctions;
 import Models.Product;
 
 import javax.swing.*;
+import java.awt.*;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
+
+//final
 
 /**
  *
@@ -18,19 +21,108 @@ import java.util.Map;
  */
 public class ManageProducts extends javax.swing.JFrame {
 
-    /**
-     * Creates new form manageProducts
-     */
-
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     AdminController adminController = new AdminController();
     UtilityFunctions uFunctions = new UtilityFunctions();
-
-    public ManageProducts() throws SQLException
-    {
+    JComboBox<String> yearComboBox = uFunctions.createExpiryYearComboBox();
+    JComboBox<String> monthComboBox = uFunctions.createMonthComboBox();
+    JComboBox<String> dayComboBox = uFunctions.createDayComboBox();
+    public ManageProducts() throws SQLException {
         initComponents();
         adminController.initializeProductsTable(tblProducts);
+    }
+
+    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) throws SQLException {
+        // TODO add your handling code here:
+        this.dispose();
+        ManagerDashboard managerDashboard= new ManagerDashboard();
+        managerDashboard.setVisible(true);
 
     }
+
+    private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {
+        boolean addResult = adminController.showAddProductDialog();
+
+        if (addResult) {
+            JOptionPane.showMessageDialog(this, "Product added successfully.");
+            adminController.initializeProductsTable(tblProducts);
+        } else {
+            JOptionPane.showMessageDialog(this, "Failed to add product.");
+        }
+    }
+    private void btnModifyActionPerformed(java.awt.event.ActionEvent evt) {
+        int selectedRow = tblProducts.getSelectedRow();
+
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a product to modify.");
+            return;
+        }
+
+        int productID = (int) tblProducts.getValueAt(selectedRow, 0);
+        Product existingProduct = adminController.getProductByID(productID);
+
+        boolean modifyResult = adminController.showModifyProductDialog(existingProduct);
+
+        if (modifyResult) {
+            JOptionPane.showMessageDialog(this, "Product details updated successfully.");
+            adminController.initializeProductsTable(tblProducts);
+        } else {
+            JOptionPane.showMessageDialog(this, "Failed to update product details.");
+        }
+    }
+    private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {
+        int selectedRow = tblProducts.getSelectedRow();
+
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a product to delete.");
+            return;
+        }
+
+        int productID = (int) tblProducts.getValueAt(selectedRow, 0);
+        String productName = (String) tblProducts.getValueAt(selectedRow, 2);
+
+        boolean deleteResult = adminController.showDeleteProductDialog(productID, productName);
+
+        if (deleteResult) {
+            JOptionPane.showMessageDialog(this, "Product deleted successfully.");
+            adminController.initializeProductsTable(tblProducts);
+        } else {
+            JOptionPane.showMessageDialog(this, "Failed to delete product.");
+        }
+    }
+
+    public static void main(String args[]) {
+
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(ManageProducts.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(ManageProducts.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(ManageProducts.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(ManageProducts.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    new ManageProducts().setVisible(true);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+    }
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">
@@ -196,233 +288,12 @@ public class ManageProducts extends javax.swing.JFrame {
         });
 
         pack();
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int x = (screenSize.width - getWidth()) / 2;
+        int y = (screenSize.height - getHeight()) / 2;
+        setLocation(x, y);
     }// </editor-fold>
 
-
-
-    JComboBox<String> yearComboBox = uFunctions.createExpiryYearComboBox();
-    JComboBox<String> monthComboBox = uFunctions.createMonthComboBox();
-    JComboBox<String> dayComboBox = uFunctions.createDayComboBox();
-    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) throws SQLException {
-        // TODO add your handling code here:
-        this.dispose();
-        ManagerDashboard managerDashboard= new ManagerDashboard();
-        managerDashboard.setVisible(true);
-
-    }
-    private void btnModifyActionPerformed(java.awt.event.ActionEvent evt) {
-        int selectedRow = tblProducts.getSelectedRow();
-
-        if (selectedRow == -1) {
-            JOptionPane.showMessageDialog(this, "Please select a product to modify.");
-            return;
-        }
-
-        int productID = 0;
-
-        productID = (int) tblProducts.getValueAt(selectedRow, 0);
-        String productName = (String) tblProducts.getValueAt(selectedRow, 2);
-        double costPrice = (double) tblProducts.getValueAt(selectedRow, 3);
-        double sellingPrice = (double) tblProducts.getValueAt(selectedRow, 4);
-        int quantity = (int) tblProducts.getValueAt(selectedRow, 5);
-        String category = (String) tblProducts.getValueAt(selectedRow, 1);
-        int categoryID = adminController.getCategoryIDByName(category);
-        java.sql.Date expiryDate = (java.sql.Date) tblProducts.getValueAt(selectedRow, 6);
-
-
-        String inputProductName = JOptionPane.showInputDialog(null, "Enter Product Name (Skip to keep existing):");
-        double inputCostPrice;
-        double inputSellingPrice;
-        int inputQuantity;
-
-        if (inputProductName != null && !inputProductName.isEmpty()) {
-            productName = inputProductName;
-        }
-
-        String inputCost = JOptionPane.showInputDialog(null, "Enter Cost Price (Skip to keep existing):");
-        if (inputCost != null && !inputCost.isEmpty()) {
-            inputCostPrice = Double.parseDouble(inputCost);
-            costPrice = inputCostPrice;
-        }
-
-        String inputSelling = JOptionPane.showInputDialog(null, "Enter Selling Price (Skip to keep existing):");
-        if (inputSelling != null && !inputSelling.isEmpty()) {
-            inputSellingPrice = Double.parseDouble(inputSelling);
-            sellingPrice = inputSellingPrice;
-        }
-
-        String inputQuantityStr = JOptionPane.showInputDialog(null, "Enter Quantity (Skip to keep existing):");
-        if (inputQuantityStr != null && !inputQuantityStr.isEmpty()) {
-            inputQuantity = Integer.parseInt(inputQuantityStr);
-            quantity = inputQuantity;
-        }
-
-        Product updatedProduct = new Product(productID, productName, costPrice, sellingPrice, quantity,categoryID,expiryDate);
-
-        boolean updateResult = adminController.updateProduct(updatedProduct);
-
-        if (updateResult) {
-            JOptionPane.showMessageDialog(this, "Product " + productName + " (ID: " + productID + ") details updated successfully.");
-            adminController.initializeProductsTable(tblProducts);
-        } else {
-            JOptionPane.showMessageDialog(this, "Failed to update product details for " + productName + " (ID: " + productID + ")");
-        }
-    }
-    private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {
-        String productName = JOptionPane.showInputDialog(null, "Enter Product Name:");
-        double costPrice = 0.0;
-        double sellingPrice = 0.0;
-        int quantity = 0;
-
-        Map<Integer, String> categoryData = new HashMap<>();
-        boolean success = adminController.getCategoryData(categoryData);
-
-        if (!success) {
-            JOptionPane.showMessageDialog(null, "Failed to retrieve category data. Please try again later.");
-            return;
-        }
-
-        JComboBox<String> categoryComboBox = new JComboBox<>(categoryData.values().toArray(new String[0]));
-        int result = JOptionPane.showConfirmDialog(null, categoryComboBox, "Select a Category", JOptionPane.OK_CANCEL_OPTION);
-
-        int categoryID = -1;
-        if (result == JOptionPane.OK_OPTION && categoryComboBox.getSelectedIndex() != -1) {
-            String selectedCategory = (String) categoryComboBox.getSelectedItem();
-
-            for (Map.Entry<Integer, String> entry : categoryData.entrySet()) {
-                if (entry.getValue().equals(selectedCategory)) {
-                    categoryID = entry.getKey();
-                    break;
-                }
-            }
-        } else {
-            JOptionPane.showMessageDialog(null, "Category not selected. Please select a category.");
-            return;
-        }
-
-        String inputCost = JOptionPane.showInputDialog(null, "Enter Cost Price (Skip to set default as 0.0):");
-        if (inputCost != null && !inputCost.isEmpty()) {
-            costPrice = Double.parseDouble(inputCost);
-        }
-
-        String inputSelling = JOptionPane.showInputDialog(null, "Enter Selling Price (Skip to set default as 0.0):");
-        if (inputSelling != null && !inputSelling.isEmpty()) {
-            sellingPrice = Double.parseDouble(inputSelling);
-        }
-
-        String inputQuantityStr = JOptionPane.showInputDialog(null, "Enter Quantity (Skip to set default as 0):");
-        if (inputQuantityStr != null && !inputQuantityStr.isEmpty()) {
-            quantity = Integer.parseInt(inputQuantityStr);
-        }
-
-        JComboBox<String> yearComboBox = uFunctions.createExpiryYearComboBox();
-        JComboBox<String> monthComboBox = uFunctions.createMonthComboBox();
-        JComboBox<String> dayComboBox = uFunctions.createDayComboBox();
-
-        JPanel expiryPanel = new JPanel();
-        expiryPanel.add(yearComboBox);
-        expiryPanel.add(monthComboBox);
-        expiryPanel.add(dayComboBox);
-
-        int expiryResult;
-        boolean validDate = false;
-        String selectedExpiryDate = null;
-
-        while (!validDate) {
-            expiryResult = JOptionPane.showConfirmDialog(null, expiryPanel, "Select Expiry Date", JOptionPane.OK_CANCEL_OPTION);
-
-            if (expiryResult == JOptionPane.OK_OPTION) {
-                String selectedYear = (String) yearComboBox.getSelectedItem();
-                String selectedMonth = (String) monthComboBox.getSelectedItem();
-                String selectedDay = (String) dayComboBox.getSelectedItem();
-
-                validDate = uFunctions.isValidDate(Integer.parseInt(selectedYear), Integer.parseInt(selectedMonth), Integer.parseInt(selectedDay));
-
-                if (!validDate) {
-                    JOptionPane.showMessageDialog(null, "Please enter a valid date.");
-                } else {
-                    selectedExpiryDate = selectedYear + "-" + selectedMonth + "-" + selectedDay;
-                }
-            } else {
-                JOptionPane.showMessageDialog(null, "Expiry date not selected. Please select a date.");
-                return;
-            }
-        }
-
-        try {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            java.util.Date utilDate = dateFormat.parse(selectedExpiryDate);
-            java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
-
-            Product newProduct = new Product(0, productName, costPrice, sellingPrice, quantity,categoryID,sqlDate);
-
-            boolean addResult = adminController.addProduct(newProduct);
-
-            if (addResult) {
-                JOptionPane.showMessageDialog(this, "Product " + productName + " added successfully.");
-                adminController.initializeProductsTable(tblProducts);
-            } else {
-                JOptionPane.showMessageDialog(this, "Failed to add product " + productName);
-            }
-        } catch (ParseException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Error parsing the selected date.");
-        }
-    }
-    private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {
-        int selectedRow = tblProducts.getSelectedRow();
-
-        if (selectedRow == -1) {
-            JOptionPane.showMessageDialog(this, "Please select a category to Delete.");
-            return;
-        }
-
-        int productID = 0;
-        String name =(String) tblProducts.getValueAt(selectedRow, 2);
-        productID =(int) tblProducts.getValueAt(selectedRow, 0);
-
-        if (adminController.deleteProduct(productID))
-        {
-            JOptionPane.showMessageDialog(this, "Product" + name + ": " +productID);
-            adminController.initializeProductsTable(tblProducts);
-        }
-        else
-        {
-            JOptionPane.showMessageDialog(this, "Failed to Delete " + name +" " +productID);
-        }
-    }
-
-
-
-    public static void main(String args[]) {
-
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(ManageProducts.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(ManageProducts.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(ManageProducts.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(ManageProducts.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    new ManageProducts().setVisible(true);
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
-    }
 
     private javax.swing.JButton btnAdd;
     private javax.swing.JButton btnBack;

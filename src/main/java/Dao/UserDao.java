@@ -4,10 +4,7 @@ import Helpers.ConnectionFile;
 import Models.User;
 
 import javax.swing.table.DefaultTableModel;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,20 +20,55 @@ public class UserDao {
         }
     }
 
+
+
     public boolean addUser(User user) {
         String sql = "INSERT INTO Users (Username, Password, Role) VALUES (?, ?, ?)";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, user.getUsername());
             preparedStatement.setString(2, user.getPassword()); // Note: Password should be hashed
             preparedStatement.setString(3, user.getRole());
 
             int rowsAffected = preparedStatement.executeUpdate();
-            return rowsAffected > 0;
+
+            if (rowsAffected > 0) {
+                // Retrieve the generated keys
+                try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        int generatedUserID = generatedKeys.getInt(1);
+                        user.setUserID(generatedUserID);
+
+                    } else {
+                        throw new SQLException("Failed to get generated keys, no userID obtained.");
+                    }
+                }
+                return true;
+            } else {
+                return false; // Indicate that the insertion was not successful
+            }
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
+            return false; // Indicate that an exception occurred
         }
     }
+    public int getUserId(User user) {
+        String sql = "SELECT UserID FROM Users WHERE Username = ? AND Password = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, user.getUsername());
+            preparedStatement.setString(2, user.getPassword());
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    System.out.println( resultSet.getInt("UserID"));
+                    return resultSet.getInt("UserID");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
 
     public boolean updateUser(User user) {
         String sql = "UPDATE Users SET Username = ?, Password = ?, Role = ? WHERE UserID = ?";
@@ -107,8 +139,6 @@ public class UserDao {
         }
         return users;
     }
-
-
     public boolean getUserData(DefaultTableModel model) {
         String sql = "SELECT * FROM Users";
         try {
@@ -132,10 +162,6 @@ public class UserDao {
             return false;
         }
     }
-
-
-
-
 
     public User authenticateUser(String username, String password) {
         String sql = "SELECT * FROM Users WHERE Username = ? AND Password = ?";

@@ -3,18 +3,48 @@ package Views;
 import Controllers.UserController;
 import Models.User;
 
+import javax.swing.*;
+import java.awt.*;
 import java.sql.SQLException;
 
+//final
+
 public class Login extends javax.swing.JFrame {
-    UserController RegisterController = new UserController();
 
-
+///////////////////////////////////////////////////////////////////////////////////////////////////
     public Login() throws SQLException {
         initComponents();
     }
+    private void btnRegisterActionPerformed(java.awt.event.ActionEvent evt) {
+        this.dispose();
+        Sighnup sighnupFrame = new Sighnup();
+        sighnupFrame.setVisible(true);
+    }
+    private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) throws SQLException {
+        String username = txtUsername.getText().trim();
+        String password = new String(txtPassword.getPassword()).trim();
+
+        boolean loginSuccess = UserController.loginUser(username, password);
+        if (loginSuccess) {
+            this.dispose();
+            openDashboardBasedOnRole(Helpers.SessionManager.getCurrentUser().getRole());
+        } else {
+            JOptionPane.showMessageDialog(null, "Invalid username or password.");
+        }
+    }
+    private void openDashboardBasedOnRole(String role) throws SQLException {
+        if ("Manager".equals(role)) {
+            ManagerDashboard managerDashboard = new ManagerDashboard();
+            managerDashboard.setVisible(true);
+        } else {
+            TransactionHub transactionHub = new TransactionHub();
+            transactionHub.setVisible(true);
+        }
+    }
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
     @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">
     private void initComponents() {
 
         pnlBack = new javax.swing.JPanel();
@@ -162,41 +192,12 @@ public class Login extends javax.swing.JFrame {
         );
 
         pack();
-    }// </editor-fold>                        
-
-    private void btnRegisterActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
-        this.dispose();
-        Sighnup sighnupFrame = new Sighnup();
-        sighnupFrame.setVisible(true);
-    }
-
-    private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) throws SQLException {
-        String username = txtUsername.getText().trim();
-        String password = new String(txtPassword.getPassword()).trim();
-       // System.out.println(username+ password );
-
-        User loggedInUser = UserController.loginUser(username, password);
-        if (loggedInUser != null)
-        {
-            this.dispose();
-            openDashboardBasedOnRole(loggedInUser.getRole());
-        }
-    }
-
-    private void openDashboardBasedOnRole(String role) throws SQLException {
-        if ("Manager".equals(role)) {
-            ManagerDashboard managerDashboard = new ManagerDashboard();
-            managerDashboard.setVisible(true);
-        } else {
-            TransactionHub transactionHub = new TransactionHub();
-            transactionHub.setVisible(true);
-        }
-    }
-
-
-
-    public static void main(String args[]) {
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int x = (screenSize.width - getWidth()) / 2;
+        int y = (screenSize.height - getHeight()) / 2;
+        setLocation(x, y);
+    }// </editor-fold>
+    public static void main(String[] args) {
 
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {

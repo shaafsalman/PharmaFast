@@ -4,17 +4,20 @@ import Helpers.CsvReader;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.*;
 import java.io.File;
 import java.sql.SQLException;
 
-
+//final
 public class AddStock extends javax.swing.JFrame {
+
+
     AdminController adminController = new AdminController();
     CsvReader csvReader = new CsvReader();
-    
     public AddStock() throws SQLException {
         initComponents();
     }
+///////////////////////////////////////////////////////////////////////////////////////////////////
     private void btnUploadActionPerformed(java.awt.event.ActionEvent evt) {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Choose CSV File");
@@ -32,20 +35,30 @@ public class AddStock extends javax.swing.JFrame {
             progressBar.setValue(100);
         }
     }
-
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) throws SQLException {
-        // TODO add your handling code here:
         this.dispose();
         ManagerDashboard managerDashboard= new ManagerDashboard();
         managerDashboard.setVisible(true);
 
     }
-
+    public static void main(String args[]) {
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    new AddStock().setVisible(true);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+    }
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">
     private void initComponents() {
+
 
         pnlTittle = new javax.swing.JPanel();
         picProfile = new javax.swing.JLabel();
@@ -171,24 +184,13 @@ public class AddStock extends javax.swing.JFrame {
 
         pack();
 
-
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int x = (screenSize.width - getWidth()) / 2;
+        int y = (screenSize.height - getHeight()) / 2;
+        setLocation(x, y);
 
     }// </editor-fold>
 
-
-
-    public static void main(String args[]) {
-
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    new AddStock().setVisible(true);
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
-    }
 
     private javax.swing.JButton btnBack;
     private javax.swing.JButton btnUpload;

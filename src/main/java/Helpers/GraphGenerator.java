@@ -37,14 +37,12 @@ public class GraphGenerator {
 
                 switch (reportType) {
                     case "daily":
-                        // Use a line chart for daily reports
                         dataDate = resultSet.getDate("TransactionDate").toLocalDate();
                         totalCost = resultSet.getDouble("CostPrice");
                         totalSales = resultSet.getDouble("SellingPrice");
                         profit = resultSet.getDouble("Profit");
                         break;
                     case "monthly":
-                        // Use a bar chart for monthly reports
                         int month = resultSet.getInt("Month");
                         int year = resultSet.getInt("Year");
                         dataDate = YearMonth.of(year, month).atDay(1);
@@ -53,7 +51,6 @@ public class GraphGenerator {
                         profit = totalSales - totalCost;
                         break;
                     case "yearly":
-                        // Use a stacked bar chart for yearly reports
                         month = resultSet.getInt("Month");
                         year = Integer.parseInt(date);
                         dataDate = YearMonth.of(year, month).atDay(1);
@@ -162,15 +159,15 @@ public class GraphGenerator {
     }
 
 
-//    public static void main(String[] args)
-//    {
-//        String dailyGraphPath = GraphGenerator.generateGraph("daily", "2022-01-01");
-//        System.out.println("Daily report graph generated at: " + dailyGraphPath);
-//
-//        String monthlyGraphPath = GraphGenerator.generateGraph("monthly", "2022-11");
-//        System.out.println("Monthly report graph generated at: " + monthlyGraphPath);
-//
-//        String yearlyGraphPath = GraphGenerator.generateGraph("yearly", "2022");
-//        System.out.println("Yearly report graph generated at: " + yearlyGraphPath);
-//    }
+    public static void main(String[] args)
+    {
+        String dailyGraphPath = GraphGenerator.generateGraph("daily", "2022-01-01");
+        System.out.println("Daily report graph generated at: " + dailyGraphPath);
+
+        String monthlyGraphPath = GraphGenerator.generateGraph("monthly", "2022-11");
+        System.out.println("Monthly report graph generated at: " + monthlyGraphPath);
+
+        String yearlyGraphPath = GraphGenerator.generateGraph("yearly", "2022");
+        System.out.println("Yearly report graph generated at: " + yearlyGraphPath);
+    }
 }

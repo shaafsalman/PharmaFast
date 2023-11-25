@@ -6,20 +6,22 @@ import Helpers.ReportGenerator;
 import Helpers.UtilityFunctions;
 
 import javax.swing.*;
+import java.awt.*;
 import java.sql.SQLException;
+
+//final
 
 /**
  *
  * @author ShaafSalman
  */
 public class ManageReports extends javax.swing.JFrame {
-
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ReportGenerator reportGenerator = new ReportGenerator();
-    UtilityFunctions uf = new UtilityFunctions();
-
-    JComboBox<String> yearComboBox = uf.createYearComboBox();
-    JComboBox<String> monthComboBox = uf.createMonthComboBox();
-    JComboBox<String> dayComboBox = uf.createDayComboBox();
+    UtilityFunctions UFunctions = new UtilityFunctions();
+    JComboBox<String> yearComboBox = UFunctions.createYearComboBox();
+    JComboBox<String> monthComboBox = UFunctions.createMonthComboBox();
+    JComboBox<String> dayComboBox = UFunctions.createDayComboBox();
     AdminController adminController = new AdminController();
 
 
@@ -27,7 +29,116 @@ public class ManageReports extends javax.swing.JFrame {
         initComponents();
     }
 
+    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) throws SQLException {
+        // TODO add your handling code here:
+        this.dispose();
+        ManagerDashboard managerDashboard= new ManagerDashboard();
+        managerDashboard.setVisible(true);
 
+    }
+    private void btnBack1ActionPerformed(java.awt.event.ActionEvent evt) throws SQLException {
+        // TODO add your handling code here:
+        this.dispose();
+        ManagerDashboard managerDashboard= new ManagerDashboard();
+        managerDashboard.setVisible(true);
+
+    }
+    
+    private void btnMonthlyReportActionPerformed(java.awt.event.ActionEvent evt) {
+        String selectedYear = (String) yearComboBox.getSelectedItem();
+        String selectedMonth = (String) monthComboBox.getSelectedItem();
+
+        if (selectedYear != null && selectedMonth != null) {
+            String date = selectedYear + "-" + selectedMonth;
+
+            Object[] message = {
+                    "Select a date:",
+                    yearComboBox,
+                    monthComboBox
+            };
+
+            int option = JOptionPane.showConfirmDialog(null, message, "Monthly Report", JOptionPane.OK_CANCEL_OPTION);
+            if (option == JOptionPane.OK_OPTION) {
+                String filePath = reportGenerator.generateReport("monthly", date);
+                if (filePath != null && !filePath.isEmpty()) {
+                    UFunctions.displayReport(filePath);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Report generation failed.");
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Please select a year and a month.");
+        }
+    }
+    private void btnAnumReportActionPerformed(java.awt.event.ActionEvent evt) {
+        String selectedYear = (String) yearComboBox.getSelectedItem();
+
+        if (selectedYear != null) {
+            Object[] message = {
+                    "Select a year:",
+                    yearComboBox
+            };
+
+            int option = JOptionPane.showConfirmDialog(null, message, "Yearly Report", JOptionPane.OK_CANCEL_OPTION);
+            if (option == JOptionPane.OK_OPTION) {
+                String filePath = reportGenerator.generateReport("yearly", selectedYear);
+                if (filePath != null && !filePath.isEmpty()) {
+                    UFunctions.displayReport(filePath);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Report generation failed.");
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Please select a year.");
+        }
+    }
+    private void btnDailyReportActionPerformed(java.awt.event.ActionEvent evt) {
+        if (yearComboBox.getItemCount() > 0 && monthComboBox.getItemCount() > 0 && dayComboBox.getItemCount() > 0) {
+            Object[] message = {
+                    "Select a date:",
+                    "Year:", yearComboBox,
+                    "Month:", monthComboBox,
+                    "Day:", dayComboBox
+            };
+
+            int option = JOptionPane.showConfirmDialog(null, message, "Daily Report", JOptionPane.OK_CANCEL_OPTION);
+            if (option == JOptionPane.OK_OPTION) {
+                String selectedYear = (String) yearComboBox.getSelectedItem();
+                String selectedMonth = (String) monthComboBox.getSelectedItem();
+                String selectedDay = (String) dayComboBox.getSelectedItem();
+
+                if (selectedYear != null && selectedMonth != null && selectedDay != null) {
+                    String date = selectedYear + "-" + selectedMonth + "-" + selectedDay;
+
+                    String filePath = reportGenerator.generateReport("daily", date);
+                    if (filePath != null && !filePath.isEmpty()) {
+                        UFunctions.displayReport(filePath);
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Report generation failed.");
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(null, "Please select a valid year, month, and day.");
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Please ensure the combo boxes are populated.");
+        }
+    }
+    
+    public static void main(String args[]) {
+
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    new ManageReports().setVisible(true);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+    }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">
     private void initComponents() {
@@ -273,123 +384,11 @@ public class ManageReports extends javax.swing.JFrame {
         );
 
         pack();
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int x = (screenSize.width - getWidth()) / 2;
+        int y = (screenSize.height - getHeight()) / 2;
+        setLocation(x, y);
     }// </editor-fold>
-
-    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) throws SQLException {
-        // TODO add your handling code here:
-        this.dispose();
-        ManagerDashboard managerDashboard= new ManagerDashboard();
-        managerDashboard.setVisible(true);
-
-    }
-
-    private void btnBack1ActionPerformed(java.awt.event.ActionEvent evt) throws SQLException {
-        // TODO add your handling code here:
-        this.dispose();
-        ManagerDashboard managerDashboard= new ManagerDashboard();
-        managerDashboard.setVisible(true);
-
-    }
-
-
-
-    private void btnMonthlyReportActionPerformed(java.awt.event.ActionEvent evt) {
-        String selectedYear = (String) yearComboBox.getSelectedItem();
-        String selectedMonth = (String) monthComboBox.getSelectedItem();
-
-        if (selectedYear != null && selectedMonth != null) {
-            String date = selectedYear + "-" + selectedMonth;
-
-            Object[] message = {
-                    "Select a date:",
-                    yearComboBox,
-                    monthComboBox
-            };
-
-            int option = JOptionPane.showConfirmDialog(null, message, "Monthly Report", JOptionPane.OK_CANCEL_OPTION);
-            if (option == JOptionPane.OK_OPTION) {
-                String filePath = reportGenerator.generateReport("monthly", date);
-                if (filePath != null && !filePath.isEmpty()) {
-                    uf.displayReport(filePath);
-                } else {
-                    JOptionPane.showMessageDialog(null, "Report generation failed.");
-                }
-            }
-        } else {
-            JOptionPane.showMessageDialog(null, "Please select a year and a month.");
-        }
-    }
-
-    private void btnAnumReportActionPerformed(java.awt.event.ActionEvent evt) {
-        String selectedYear = (String) yearComboBox.getSelectedItem();
-
-        if (selectedYear != null) {
-            Object[] message = {
-                    "Select a year:",
-                    yearComboBox
-            };
-
-            int option = JOptionPane.showConfirmDialog(null, message, "Yearly Report", JOptionPane.OK_CANCEL_OPTION);
-            if (option == JOptionPane.OK_OPTION) {
-                String filePath = reportGenerator.generateReport("yearly", selectedYear);
-                if (filePath != null && !filePath.isEmpty()) {
-                    uf.displayReport(filePath);
-                } else {
-                    JOptionPane.showMessageDialog(null, "Report generation failed.");
-                }
-            }
-        } else {
-            JOptionPane.showMessageDialog(null, "Please select a year.");
-        }
-    }
-
-    private void btnDailyReportActionPerformed(java.awt.event.ActionEvent evt) {
-        if (yearComboBox.getItemCount() > 0 && monthComboBox.getItemCount() > 0 && dayComboBox.getItemCount() > 0) {
-            Object[] message = {
-                    "Select a date:",
-                    "Year:", yearComboBox,
-                    "Month:", monthComboBox,
-                    "Day:", dayComboBox
-            };
-
-            int option = JOptionPane.showConfirmDialog(null, message, "Daily Report", JOptionPane.OK_CANCEL_OPTION);
-            if (option == JOptionPane.OK_OPTION) {
-                String selectedYear = (String) yearComboBox.getSelectedItem();
-                String selectedMonth = (String) monthComboBox.getSelectedItem();
-                String selectedDay = (String) dayComboBox.getSelectedItem();
-
-                if (selectedYear != null && selectedMonth != null && selectedDay != null) {
-                    String date = selectedYear + "-" + selectedMonth + "-" + selectedDay;
-
-                    String filePath = reportGenerator.generateReport("daily", date);
-                    if (filePath != null && !filePath.isEmpty()) {
-                        uf.displayReport(filePath);
-                    } else {
-                        JOptionPane.showMessageDialog(null, "Report generation failed.");
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(null, "Please select a valid year, month, and day.");
-                }
-            }
-        } else {
-            JOptionPane.showMessageDialog(null, "Please ensure the combo boxes are populated.");
-        }
-    }
-
-
-    public static void main(String args[]) {
-
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    new ManageReports().setVisible(true);
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
-    }
-
     private javax.swing.JButton btnAdd;
     private javax.swing.JButton btnAnumReport;
     private javax.swing.JButton btnBack;

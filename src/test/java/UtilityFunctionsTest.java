@@ -1,4 +1,5 @@
 import Helpers.UtilityFunctions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import javax.swing.*;
@@ -6,15 +7,23 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
+import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+
+//verified
 class UtilityFunctionsTest {
+
+    private UtilityFunctions utilityFunctions;
+
+    @BeforeEach
+    void init() {
+        utilityFunctions = new UtilityFunctions();
+    }
 
     @Test
     void createDayComboBox() {
-        UtilityFunctions utilityFunctions = new UtilityFunctions();
         JComboBox<String> dayComboBox = utilityFunctions.createDayComboBox();
         assertNotNull(dayComboBox);
         assertEquals(31, dayComboBox.getItemCount());
@@ -24,7 +33,6 @@ class UtilityFunctionsTest {
 
     @Test
     void createMonthComboBox() {
-        UtilityFunctions utilityFunctions = new UtilityFunctions();
         JComboBox<String> monthComboBox = utilityFunctions.createMonthComboBox();
         assertNotNull(monthComboBox);
         assertEquals(12, monthComboBox.getItemCount());
@@ -34,7 +42,6 @@ class UtilityFunctionsTest {
 
     @Test
     void createYearComboBox() {
-        UtilityFunctions utilityFunctions = new UtilityFunctions();
         JComboBox<String> yearComboBox = utilityFunctions.createYearComboBox();
         assertNotNull(yearComboBox);
         int currentYear = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR);
@@ -45,7 +52,6 @@ class UtilityFunctionsTest {
 
     @Test
     void createExpiryYearComboBox() {
-        UtilityFunctions utilityFunctions = new UtilityFunctions();
         JComboBox<String> yearComboBox = utilityFunctions.createExpiryYearComboBox();
         assertNotNull(yearComboBox);
         int currentYear = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR);
@@ -74,20 +80,32 @@ class UtilityFunctionsTest {
         assertFalse(UtilityFunctions.isValidDate(-1, 11, 24));   // Invalid year
     }
 
-
     @Test
     void placeRestockOrder() throws IOException {
+        // Arrange
         UtilityFunctions utilityFunctions = new UtilityFunctions();
-        File tempDirectory = Files.createTempDirectory("test-stock-requests").toFile();
-        utilityFunctions.placeRestockOrder("Product1", "Category1", 10, 20);
+        String productName = "TestProduct";
+        String category = "TestCategory";
+        int currentQuantity = 5;
+        int newQuantity = 10;
 
+        boolean result = utilityFunctions.placeRestockOrder(productName, category, currentQuantity, newQuantity);
+
+        assertTrue(result);
+
+        File tempDirectory = new File("src/main/resources/StockRequests");
         File[] files = tempDirectory.listFiles();
+
         assertNotNull(files);
         assertEquals(1, files.length);
 
-        String content = new String(Files.readAllBytes(Path.of(files[0].getPath())));
-        assertTrue(content.contains("Product1 (Category1): Restock order - 20 Requested on"));
+        String expectedContent = productName + " (" + category + "): Restock order - " + newQuantity + " Requested on " + LocalDate.now();
+        String fileContent = new String(Files.readAllBytes(Path.of(files[0].getPath())));
+
+        assertTrue(fileContent.contains(expectedContent));
     }
+
+
 
 
 }
