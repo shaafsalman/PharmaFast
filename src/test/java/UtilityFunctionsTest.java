@@ -89,7 +89,7 @@ class UtilityFunctionsTest {
         int currentQuantity = 5;
         int newQuantity = 10;
 
-        boolean result = utilityFunctions.placeRestockOrder(productName, category, currentQuantity, newQuantity);
+        boolean result = Boolean.parseBoolean(UtilityFunctions.placeRestockOrder(productName, category, currentQuantity, newQuantity));
 
         assertTrue(result);
 
