@@ -44,10 +44,7 @@ public class ManageProducts extends javax.swing.JFrame {
         boolean addResult = adminController.showAddProductDialog();
 
         if (addResult) {
-            JOptionPane.showMessageDialog(this, "Product added successfully.");
             adminController.initializeProductsTable(tblProducts);
-        } else {
-            JOptionPane.showMessageDialog(this, "Failed to add product.");
         }
     }
     private void btnModifyActionPerformed(java.awt.event.ActionEvent evt) {
@@ -57,17 +54,12 @@ public class ManageProducts extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Please select a product to modify.");
             return;
         }
-
         int productID = (int) tblProducts.getValueAt(selectedRow, 0);
         Product existingProduct = adminController.getProductByID(productID);
-
         boolean modifyResult = adminController.showModifyProductDialog(existingProduct);
-
-        if (modifyResult) {
-            JOptionPane.showMessageDialog(this, "Product details updated successfully.");
+        if (modifyResult)
+        {
             adminController.initializeProductsTable(tblProducts);
-        } else {
-            JOptionPane.showMessageDialog(this, "Failed to update product details.");
         }
     }
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {

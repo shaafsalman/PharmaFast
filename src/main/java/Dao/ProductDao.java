@@ -267,6 +267,4 @@ public class ProductDao {
         }
         return availableQuantity;
     }
-
-
 }

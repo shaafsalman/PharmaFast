@@ -3,7 +3,7 @@ package Models;
 import java.sql.Date;
 
 public class Product {
-    private int productID;
+    private final int productID;
     private String productName;
     private double costPrice;
     private double sellingPrice;
@@ -61,9 +61,9 @@ public class Product {
 
     public void setCostPrice(double costPrice) {this.costPrice = costPrice;}
 
-    public void setSellingPrice(double modifiedSellingPrice) {this.sellingPrice =sellingPrice;}
+    public void setSellingPrice(double modifiedSellingPrice) {this.sellingPrice =modifiedSellingPrice;}
 
-    public void setQuantity(int modifiedQuantity) {this.quantity = quantity;}
+    public void setQuantity(int modifiedQuantity) {this.quantity = modifiedQuantity;}
 
     public String getName() {return productName;}
 }

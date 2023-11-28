@@ -67,12 +67,9 @@ public class UtilityFunctions {
     public static boolean validateEmail(String email) {
         return email.contains("@");
     }
-
-
     public static boolean validatePassword(String password, String repeatPassword) {
         return password.equals(repeatPassword);
     }
-
     public static boolean isValidDate(int year, int month, int day) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         dateFormat.setLenient(false);
@@ -98,6 +95,8 @@ public class UtilityFunctions {
             return false;
         }
     }
+
+
     public static void displayReport(String filePath) {
         if (filePath != null && !filePath.isEmpty()) {
             File reportFile = new File(filePath);
@@ -154,6 +153,8 @@ public class UtilityFunctions {
             }
         }
 
+        table.setSelectionBackground(new Color(220, 220, 220));
+
         JTableHeader header = table.getTableHeader();
         header.setFont(new Font("Century Gothic", Font.PLAIN, 18));
         header.setBackground(new Color(47, 47, 47));
@@ -172,7 +173,6 @@ public class UtilityFunctions {
         table.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
 
     }
-
     public void displayGraph(String filePath) {
         if (filePath != null && !filePath.isEmpty()) {
             try {
@@ -204,6 +204,9 @@ public class UtilityFunctions {
             JOptionPane.showMessageDialog(null, "Graph generation failed. File path is empty or null.");
         }
     }
-
-
+    public boolean isValidField(String input)
+    {
+        String regex = "^[^A-Za-z]*$";
+        return !input.matches(regex);
+    }
 }

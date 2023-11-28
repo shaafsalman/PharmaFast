@@ -20,7 +20,22 @@ public class UserDao {
         }
     }
 
+    public boolean userExsists(String username) {
+        String sql = "SELECT COUNT(*) FROM Users WHERE Username = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, username);
 
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    int count = resultSet.getInt(1);
+                    return count > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 
     public boolean addUser(User user) {
         String sql = "INSERT INTO Users (Username, Password, Role) VALUES (?, ?, ?)";
@@ -59,7 +74,7 @@ public class UserDao {
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    System.out.println( resultSet.getInt("UserID"));
+                    //System.out.println( resultSet.getInt("UserID"));
                     return resultSet.getInt("UserID");
                 }
             }
@@ -68,7 +83,6 @@ public class UserDao {
         }
         return -1;
     }
-
 
     public boolean updateUser(User user) {
         String sql = "UPDATE Users SET Username = ?, Password = ?, Role = ? WHERE UserID = ?";

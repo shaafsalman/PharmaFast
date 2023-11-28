@@ -34,17 +34,12 @@ public class Sighnup extends javax.swing.JFrame {
             User newUser = new User(0, username, password, role);
             boolean registered = UserController.registerUser(newUser, adminCode);
             if (!registered) {
-                JOptionPane.showMessageDialog(null, "Registration failed.");
+                JOptionPane.showMessageDialog(null, "Please Try Again");
             }
-            JOptionPane.showMessageDialog(null, "Registration Successfully.");
-            this.dispose();
-            Login loginFrame = new Login();
-            loginFrame.setVisible(true);
 
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "Invalid admin code. Please enter a numeric value.");
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        }
+        catch (NumberFormatException e)
+        {
         }
     }
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) throws SQLException {

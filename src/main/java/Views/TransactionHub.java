@@ -34,7 +34,8 @@ public class TransactionHub extends javax.swing.JFrame {
     public TransactionHub() throws SQLException {
         initComponents();
         optimizTable(tblCart);
-
+        this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         txtSubTotal.setEditable(false);
         txtVat.setEditable(false);
         txtTotalAmount.setEditable(false);
@@ -241,6 +242,32 @@ public class TransactionHub extends javax.swing.JFrame {
         table.getColumnModel().getColumn(5).setCellRenderer(centerRenderer);
     }
 
+    public static void main(String args[]) {
+
+
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    new TransactionHub().setVisible(true);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+    }
+
+
+    private void clearAll() {
+        DefaultTableModel model = (DefaultTableModel) tblCart.getModel();
+        model.setRowCount(0);
+
+        txtSubTotal.setText("");
+        txtVat.setText("");
+        txtTotalAmount.setText("");
+        txtChange.setText("");
+        txtAmountTender.setText("");
+        txtBarcode.setText("");
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -618,32 +645,6 @@ public class TransactionHub extends javax.swing.JFrame {
     }// </editor-fold>
 
 
-    public static void main(String args[]) {
-
-
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    new TransactionHub().setVisible(true);
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
-    }
-
-
-    private void clearAll() {
-        DefaultTableModel model = (DefaultTableModel) tblCart.getModel();
-        model.setRowCount(0);
-
-        txtSubTotal.setText("");
-        txtVat.setText("");
-        txtTotalAmount.setText("");
-        txtChange.setText("");
-        txtAmountTender.setText("");
-        txtBarcode.setText("");
-    }
 
     private javax.swing.JButton btnBack;
     private javax.swing.JButton btnClose;
