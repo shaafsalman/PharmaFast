@@ -100,9 +100,6 @@ public class AdminController extends Component {
         saveConfig();
     }
 
-
-
-
     public boolean getCategoryData(Map<Integer, String> categoryData) {
         return categoryDao.getCategoryData(categoryData);
     }

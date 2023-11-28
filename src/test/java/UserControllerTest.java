@@ -19,6 +19,7 @@ class UserControllerTest {
         MockitoAnnotations.initMocks(this);
     }
 
+
     @Test
     void registerUserWithValidAdminCode() {
         User user = new User(0, "FarhanJafri", "1337", "Manager");

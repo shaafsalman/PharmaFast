@@ -84,8 +84,6 @@ class AdminControllerTest {
         verify(categoryDao, times(1)).deleteCategory(categoryId);
     }
 
-
-
     @Test
     void updateValidProduct() {
         Product product = new Product(1, "Laptop", 500.0, 700.0, 10, 1, null);
@@ -95,14 +93,12 @@ class AdminControllerTest {
         verify(productDao, times(1)).updateProduct(product);
     }
 
-    // Test for updating an invalid product (empty product name)
     @Test
     void updateInvalidProduct() {
         Product product = new Product(1, "", 500.0, 700.0, 10, 1, null);
         assertFalse(adminController.updateProduct(product));
     }
 
-    // Test for deleting a product
     @Test
     void deleteProduct() {
         int productId = 1;
