@@ -1,0 +1,3 @@
+Panadol Extra,Pain Relief,10,  Restock order
+Ibuprofen,Pain Relief,10,  Restock order
+Painkiller B,Pain Relief,20,  Restock order

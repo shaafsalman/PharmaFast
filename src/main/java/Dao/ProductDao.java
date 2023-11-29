@@ -65,13 +65,14 @@ public class ProductDao {
     }
     public boolean updateProduct(Product product) {
         try (PreparedStatement preparedStatement = connection.prepareStatement(
-                "UPDATE Products SET ProductName = ?, Price = ?, SellingPrice = ?, Quantity = ? WHERE ProductID = ?")) {
+                "UPDATE Products SET ProductName = ?, Price = ?, SellingPrice = ?, Quantity = ?, ExpiryDate = ? WHERE ProductID = ?")) {
 
             preparedStatement.setString(1, product.getProductName());
             preparedStatement.setDouble(2, product.getCostPrice());
             preparedStatement.setDouble(3, product.getSellingPrice());
             preparedStatement.setInt(4, product.getQuantity());
-            preparedStatement.setInt(5, product.getProductID());
+            preparedStatement.setDate(5, product.getExpiryDate());  // Set ExpiryDate as java.sql.Date
+            preparedStatement.setInt(6, product.getProductID());
 
             int rowsAffected = preparedStatement.executeUpdate();
 
@@ -81,6 +82,7 @@ public class ProductDao {
             return false;
         }
     }
+
     public boolean deleteProduct(int productId) {
         try (PreparedStatement preparedStatement = connection.prepareStatement(
                 "DELETE FROM Products WHERE ProductID = ?")) {
@@ -303,7 +305,32 @@ public class ProductDao {
 
         return false;
     }
+    public ArrayList<Product> getAllProducts() {
+        ArrayList<Product> productList = new ArrayList<>();
 
+        String query = "SELECT * FROM Products";
 
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+
+            while (resultSet.next()) {
+                int productID = resultSet.getInt("ProductID");
+                String productName = resultSet.getString("ProductName");
+                double costPrice = resultSet.getDouble("Price");
+                double sellingPrice = resultSet.getDouble("SellingPrice");
+                int quantity = resultSet.getInt("Quantity");
+                int categoryID = resultSet.getInt("CategoryID");
+                Date expiryDate = resultSet.getDate("ExpiryDate");
+
+                Product product = new Product(productID, productName, costPrice, sellingPrice, quantity, categoryID, expiryDate);
+                productList.add(product);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return productList;
+    }
 
 }

@@ -1,6 +1,7 @@
 package Models;
 
 import java.sql.Date;
+import java.util.Calendar;
 
 public class Product {
     private final int productID;
@@ -66,4 +67,44 @@ public class Product {
     public void setQuantity(int modifiedQuantity) {this.quantity = modifiedQuantity;}
 
     public String getName() {return productName;}
+
+    public int getExpiryDay() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(expiryDate);
+        return calendar.get(Calendar.DAY_OF_MONTH);
+    }
+
+    public int getExpiryMonth() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(expiryDate);
+        return calendar.get(Calendar.MONTH) + 1;
+    }
+
+    public int getExpiryYear() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(expiryDate);
+        return calendar.get(Calendar.YEAR);
+    }
+
+    public void setExpiryDay(int day) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(expiryDate);
+        calendar.set(Calendar.DAY_OF_MONTH, day);
+        expiryDate = (Date) calendar.getTime();
+    }
+
+    public void setExpiryMonth(int month) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(expiryDate);
+        calendar.set(Calendar.MONTH, month - 1);
+        expiryDate = (Date) calendar.getTime();
+    }
+
+    public void setExpiryYear(int year) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(expiryDate);
+        calendar.set(Calendar.YEAR, year);
+        expiryDate = (Date) calendar.getTime();
+    }
+
 }

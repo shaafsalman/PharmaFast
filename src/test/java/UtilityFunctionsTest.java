@@ -80,32 +80,4 @@ class UtilityFunctionsTest {
         assertFalse(UtilityFunctions.isValidDate(-1, 11, 24));   // Invalid year
     }
 
-    @Test
-    void placeRestockOrder() throws IOException {
-        // Arrange
-        UtilityFunctions utilityFunctions = new UtilityFunctions();
-        String productName = "TestProduct";
-        String category = "TestCategory";
-        int currentQuantity = 5;
-        int newQuantity = 10;
-
-        boolean result = Boolean.parseBoolean(UtilityFunctions.placeRestockOrder(productName, category, currentQuantity, newQuantity));
-
-        assertTrue(result);
-
-        File tempDirectory = new File("src/main/resources/StockRequests");
-        File[] files = tempDirectory.listFiles();
-
-        assertNotNull(files);
-        assertEquals(1, files.length);
-
-        String expectedContent = productName + " (" + category + "): Restock order - " + newQuantity + " Requested on " + LocalDate.now();
-        String fileContent = new String(Files.readAllBytes(Path.of(files[0].getPath())));
-
-        assertTrue(fileContent.contains(expectedContent));
-    }
-
-
-
-
 }

@@ -17,8 +17,10 @@ import java.io.*;
 import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class AdminController extends Component {
 
@@ -593,18 +595,37 @@ public class AdminController extends Component {
         }
     }
     public boolean showModifyProductDialog(Product existingProduct) {
-        JPanel panel = new JPanel(new GridLayout(4, 2));
+        JPanel panel = new JPanel(new GridLayout(8, 2));
+
+
 
         JTextField nameField = new JTextField(existingProduct.getName());
         panel.add(new JLabel("Product Name:"));
         panel.add(nameField);
 
-        JSpinner costPriceSpinner = new JSpinner(new SpinnerNumberModel(0.0, 0.0, Double.MAX_VALUE, 0.1));
+        panel.add(new JLabel("Select a Category:"));
+
+        Map<Integer, String> categoryData = new HashMap<>();
+        boolean success = getCategoryData(categoryData);
+
+        JComboBox<String> categoryComboBox = new JComboBox<>(categoryData.values().toArray(new String[0]));
+
+        int existingCategoryId = existingProduct.getCategoryID();
+
+        for (Map.Entry<Integer, String> entry : categoryData.entrySet()) {
+            if (entry.getKey() == existingCategoryId) {
+                categoryComboBox.setSelectedItem(entry.getValue());
+                break;
+            }
+        }
+
+        panel.add(categoryComboBox);
+        JSpinner costPriceSpinner = new JSpinner(new SpinnerNumberModel(existingProduct.getCostPrice(), 0.0, Double.MAX_VALUE, 0.1));
         costPriceSpinner.setPreferredSize(new Dimension(100, costPriceSpinner.getPreferredSize().height));
         panel.add(new JLabel("Enter Cost Price:"));
         panel.add(costPriceSpinner);
 
-        JSpinner sellingPriceSpinner = new JSpinner(new SpinnerNumberModel(0.0, 0.0, Double.MAX_VALUE, 0.1));
+        JSpinner sellingPriceSpinner = new JSpinner(new SpinnerNumberModel(existingProduct.getSellingPrice(), 0.0, Double.MAX_VALUE, 0.1));
         sellingPriceSpinner.setPreferredSize(new Dimension(100, sellingPriceSpinner.getPreferredSize().height));
         panel.add(new JLabel("Enter Selling Price:"));
         panel.add(sellingPriceSpinner);
@@ -613,67 +634,75 @@ public class AdminController extends Component {
         panel.add(new JLabel("Quantity:"));
         panel.add(quantitySpinner);
 
-        boolean exitCheck = false;
+        // Expiry Date Section
+        panel.add(new JLabel("Expiry Date:"));
+
+        JComboBox<String> yearComboBox = uFunctions.createYearComboBox();
+        JComboBox<String> monthComboBox = uFunctions.createMonthComboBox();
+        JComboBox<String> dayComboBox = uFunctions.createDayComboBox();
+
+        // Set initial values based on existing product expiry date
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(existingProduct.getExpiryDate());
+        yearComboBox.setSelectedItem(String.valueOf(calendar.get(Calendar.YEAR)));
+        monthComboBox.setSelectedItem(String.format("%02d", calendar.get(Calendar.MONTH) + 1)); // Add 1 because months are zero-based
+        dayComboBox.setSelectedItem(String.format("%02d", calendar.get(Calendar.DAY_OF_MONTH)));
+
+        JPanel expiryPanel = new JPanel();
+        expiryPanel.add(yearComboBox);
+        expiryPanel.add(monthComboBox);
+        expiryPanel.add(dayComboBox);
+
+        panel.add(expiryPanel);
+
         int result = JOptionPane.showConfirmDialog(null, panel, "Modify Product", JOptionPane.OK_CANCEL_OPTION);
 
         if (result == JOptionPane.CANCEL_OPTION) {
-            exitCheck = true;
             return false;
         }
 
-
-        String modifiedProductName = nameField.getText();
-        String inputCost = costPriceSpinner.toString().trim();
-        String inputSelling = sellingPriceSpinner.toString().trim();
-        int modifiedQuantity = (int) quantitySpinner.getValue();
-
         try {
-
-            if(!uFunctions.isValidField(inputSelling))
-            {
-
-                JOptionPane.showMessageDialog(null, "Please add Selling price in Numbers!");
-                return false;
-            }
-
-            if(!uFunctions.isValidField(inputCost))
-            {
-                JOptionPane.showMessageDialog(null, "Please add Cost price in Numbers!");
-                return false;
-            }
-
-            if(!uFunctions.isValidField(quantitySpinner.toString()))
-            {
-                JOptionPane.showMessageDialog(null, "Please add Quantity in Numbers!");
-                return false;
-            }
-
-            double modifiedCostPrice = inputCost.isEmpty() ? existingProduct.getCostPrice() : Double.parseDouble(inputCost);
-            double modifiedSellingPrice = inputSelling.isEmpty() ? existingProduct.getSellingPrice() : Double.parseDouble(inputSelling);
+            String modifiedProductName = nameField.getText();
+            double modifiedCostPrice = (double) costPriceSpinner.getValue();
+            double modifiedSellingPrice = (double) sellingPriceSpinner.getValue();
+            int modifiedQuantity = (int) quantitySpinner.getValue();
 
             existingProduct.setName(modifiedProductName);
             existingProduct.setCostPrice(modifiedCostPrice);
             existingProduct.setSellingPrice(modifiedSellingPrice);
             existingProduct.setQuantity(modifiedQuantity);
+            int modifiedYear = Integer.parseInt((String) yearComboBox.getSelectedItem());
+            int modifiedMonth = Integer.parseInt((String) monthComboBox.getSelectedItem()) - 1;
+            int modifiedDay = Integer.parseInt((String) dayComboBox.getSelectedItem());
+
+            String selectedCategoryName = (String) categoryComboBox.getSelectedItem();
+            int selectedCategoryID = getCategoryIDByName(selectedCategoryName);
+            existingProduct.setCategoryID(selectedCategoryID);
+
+
+
+            Calendar modifiedCalendar = Calendar.getInstance();
+            modifiedCalendar.set(modifiedYear, modifiedMonth, modifiedDay);
+
+            Date modifiedExpiryDate = new Date(modifiedCalendar.getTimeInMillis());
+            existingProduct.setExpiryDate(modifiedExpiryDate);
 
             boolean updateResult = updateProduct(existingProduct);
 
-            if(exitCheck)
-            {
-                return true;
-            }
 
             if (updateResult) {
+                JOptionPane.showMessageDialog(null, "Details updated for  " + existingProduct.getName());
                 return true;
             } else {
                 JOptionPane.showMessageDialog(null, "Failed to update product details for " + existingProduct.getName());
                 return false;
             }
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "Invalid input for price. Please enter valid numbers.");
+            JOptionPane.showMessageDialog(null, "Invalid input. Please enter valid numeric values.");
             return false;
         }
     }
+
     public boolean showDeleteProductDialog(int productID, String productName) {
         int confirmResult = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete the product " + productName + "?");
 

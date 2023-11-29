@@ -5,13 +5,20 @@ import Dao.TransactionItemDao;
 import Helpers.ReportGenerator;
 import Helpers.SessionManager;
 import Helpers.UtilityFunctions;
+import Models.Product;
 import Models.Transaction;
 import Models.TransactionItem;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableCellRenderer;
+import java.awt.*;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 
 public class CashierController
 {
@@ -115,5 +122,65 @@ public class CashierController
         }
     }
 
+    public ArrayList<Product>getAllProducts()
+    {
+        return productDao.getAllProducts();
+    }
+    public Product findProductByName(String productName) {
+        for (Product product : getAllProducts()) {
+            if (product.getProductName().equalsIgnoreCase(productName)) {
+                return product;
+            }
+        }
+        return null;
+    }
+    public void initializeProducts(JComboBox productComboBox) {
+        // Clear existing items
+        productComboBox.removeAllItems();
+
+        for (Product product : getAllProducts()) {
+            productComboBox.addItem(product.getProductName());
+        }
+    }
+
+    public void optimizTable(JTable table) {
+        // Set row height and other table properties
+        table.setRowHeight(40);
+        table.setOpaque(false);
+        table.setShowGrid(false);
+        table.setBackground(new Color(255, 255, 255));
+
+        table.setSelectionBackground(new Color(220, 220, 220));
+
+        class HeaderRenderer extends DefaultTableCellRenderer {
+            public HeaderRenderer() {
+                setHorizontalAlignment(SwingConstants.CENTER);
+            }
+        }
+        JTableHeader header = table.getTableHeader();
+        header.setFont(new Font("Century Gothic", Font.PLAIN, 18));
+        header.setBackground(new Color(47, 47, 47));
+        header.setForeground(Color.darkGray);
+        header.setBorder(new EmptyBorder(20, 10, 20, 10));
+        TableCellRenderer headerRenderer = new HeaderRenderer();
+        table.getTableHeader().setDefaultRenderer(headerRenderer);
+
+        // Set cell properties
+        table.setFont(new Font("Century Gothic", Font.PLAIN, 14));
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+        }
+
+//        DefaultTableModel model = new DefaultTableModel() {
+//            @Override
+//            public boolean isCellEditable(int row, int column) {
+//                return false;
+//            }
+//        };
+//
+//        table.setModel(model);
+    }
 
 }
