@@ -186,8 +186,6 @@ public class AdminController extends Component {
     }
 
 
-
-
     //Initialising Tables
     public void initializeStockTable(JTable table) {
         DefaultTableModel model = (DefaultTableModel) table.getModel();
@@ -321,6 +319,46 @@ public class AdminController extends Component {
             JOptionPane.showMessageDialog(null, "Database Error");
         }
     }
+    public void initializeExpiredProductsTable(JTable table) {
+        DefaultTableModel model = new DefaultTableModel();
+        model.addColumn("Product ID");
+        model.addColumn("Product Name");
+        model.addColumn("Quantity");
+        model.addColumn("Expiry Date");
+
+        ResultSet resultSet = null;
+
+        try {
+            resultSet = productDao.getExpiredProducts();
+
+            if (resultSet != null) {
+                while (resultSet.next()) {
+                    Object[] rowData = {
+                            resultSet.getInt("ProductID"),
+                            resultSet.getString("ProductName"),
+                            resultSet.getInt("Quantity"),
+                            resultSet.getDate("ExpiryDate")
+                    };
+                    model.addRow(rowData);
+                }
+            }
+
+            table.setModel(model);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (resultSet != null) {
+                try {
+                    resultSet.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        UtilityFunctions.initializeUForTable(table);
+    }
 
 
     public void showAddUserDialog() {
@@ -438,10 +476,6 @@ public class AdminController extends Component {
             JOptionPane.showMessageDialog(null, "User not found.");
         }
     }
-
-
-
-
     public boolean showAddProductDialog() {
         JPanel panel = new JPanel(new GridLayout(8, 2));
         panel.setBorder(BorderFactory.createEmptyBorder(30, 0, 0, 0));
@@ -534,6 +568,11 @@ public class AdminController extends Component {
             Product newProduct = new Product(0, productName, costPrice, sellingPrice, quantity, categoryID, sqlDate);
             if(productName.isEmpty())
             {
+                return false;
+            }
+            if(productDao.isProductAlreadyExists(productName,sqlDate))
+            {
+                JOptionPane.showMessageDialog(null, "Product " + productName + " already exists.");
                 return false;
             }
 
@@ -652,22 +691,6 @@ public class AdminController extends Component {
         }
     }
 
-
-
-    private int getCategoryID(Map<Integer, String> categoryData, String selectedCategory) {
-        for (Map.Entry<Integer, String> entry : categoryData.entrySet()) {
-            if (entry.getValue().equals(selectedCategory)) {
-                return entry.getKey();
-            }
-        }
-        return -1;
-    }
-    private String getSelectedExpiryDate(JComboBox<String> yearComboBox, JComboBox<String> monthComboBox, JComboBox<String> dayComboBox) {
-        String selectedYear = (String) yearComboBox.getSelectedItem();
-        String selectedMonth = (String) monthComboBox.getSelectedItem();
-        String selectedDay = (String) dayComboBox.getSelectedItem();
-        return selectedYear + "-" + selectedMonth + "-" + selectedDay;
-    }
     public static void main(String[] args) {
         //String yearlyReport = generateReport("yearly", "2023");
         //String monthlyReport = generateReport("monthly", "2023-10");

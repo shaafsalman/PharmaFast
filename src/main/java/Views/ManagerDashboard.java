@@ -36,7 +36,7 @@ public class ManagerDashboard extends javax.swing.JFrame {
     }
     private void btnManageExpiredInventoryActionPerformed(java.awt.event.ActionEvent evt) throws SQLException {
         // TODO add your handling code here:
-        OrderStock x = new OrderStock();
+        ManageExpiredStock x = new ManageExpiredStock();
         x.setVisible(true);
 
     }
@@ -141,7 +141,7 @@ public class ManagerDashboard extends javax.swing.JFrame {
         btnLogOut = new javax.swing.JButton();
         btnAddNewStock = new javax.swing.JButton();
         btnManageExpiredInventory = new javax.swing.JButton();
-        btnGenerateInentoryReport = new javax.swing.JButton();
+        btnAlerts = new javax.swing.JButton();
         btnManageSalesReport = new javax.swing.JButton();
         btnManageCategories = new javax.swing.JButton();
         lblManagerPortal = new javax.swing.JLabel();
@@ -306,11 +306,11 @@ public class ManagerDashboard extends javax.swing.JFrame {
             }
         });
 
-        btnGenerateInentoryReport.setBackground(new java.awt.Color(100, 192, 244));
-        btnGenerateInentoryReport.setFont(new java.awt.Font("Century Gothic", 1, 18)); // NOI18N
-        btnGenerateInentoryReport.setForeground(new java.awt.Color(255, 255, 255));
-        btnGenerateInentoryReport.setText("Generate Inventory Report");
-        btnGenerateInentoryReport.addActionListener(new java.awt.event.ActionListener() {
+        btnAlerts.setBackground(new java.awt.Color(100, 192, 244));
+        btnAlerts.setFont(new java.awt.Font("Century Gothic", 1, 18)); // NOI18N
+        btnAlerts.setForeground(new java.awt.Color(255, 255, 255));
+        btnAlerts.setText("Alerts");
+        btnAlerts.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 try {
                     btnGenerateInentoryReportActionPerformed(evt);
@@ -404,7 +404,7 @@ public class ManagerDashboard extends javax.swing.JFrame {
                                                         .addGroup(pnlWhiteMainLayout.createSequentialGroup()
                                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                                 .addGroup(pnlWhiteMainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                                                        .addComponent(btnGenerateInentoryReport, javax.swing.GroupLayout.DEFAULT_SIZE, 383, Short.MAX_VALUE)
+                                                                        .addComponent(btnAlerts, javax.swing.GroupLayout.DEFAULT_SIZE, 383, Short.MAX_VALUE)
                                                                         .addComponent(btnManageGraphs, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                                                 .addGap(48, 48, 48))))
                                         .addGroup(pnlWhiteMainLayout.createSequentialGroup()
@@ -439,7 +439,7 @@ public class ManagerDashboard extends javax.swing.JFrame {
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                                 .addGroup(pnlWhiteMainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                                         .addComponent(btnManageSalesReport, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                        .addComponent(btnGenerateInentoryReport, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                        .addComponent(btnAlerts, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE))
                                                 .addGap(18, 18, 18)
                                                 .addGroup(pnlWhiteMainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                                         .addComponent(btnAddStock, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -474,7 +474,7 @@ public class ManagerDashboard extends javax.swing.JFrame {
     private javax.swing.JButton btnAddNewStock;
     private javax.swing.JButton btnAddStock;
     private javax.swing.JButton btnEditUserDetails;
-    private javax.swing.JButton btnGenerateInentoryReport;
+    private javax.swing.JButton btnAlerts;
     private javax.swing.JButton btnLogOut;
     private javax.swing.JButton btnManageCategories;
     private javax.swing.JButton btnManageExpiredInventory;

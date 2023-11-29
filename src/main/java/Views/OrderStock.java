@@ -26,6 +26,8 @@ public class OrderStock extends javax.swing.JFrame {
         initComponents();
         adminController.initializeStockTable(tblStock);
         adminController.initializeDeadStockTable(tblDeadStock);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+
     }
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) throws SQLException {

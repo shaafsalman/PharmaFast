@@ -26,6 +26,7 @@ public class AdminSettings extends javax.swing.JFrame {
     public AdminSettings() throws SQLException {
         initComponents();
         adminController.initializeUsersTable(tblUsers);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
     }
 

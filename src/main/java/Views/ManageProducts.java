@@ -30,6 +30,8 @@ public class ManageProducts extends javax.swing.JFrame {
     public ManageProducts() throws SQLException {
         initComponents();
         adminController.initializeProductsTable(tblProducts);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+
     }
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) throws SQLException {

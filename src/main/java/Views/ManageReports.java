@@ -27,6 +27,8 @@ public class ManageReports extends javax.swing.JFrame {
 
     public ManageReports() throws SQLException {
         initComponents();
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+
     }
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) throws SQLException {

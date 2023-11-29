@@ -267,4 +267,43 @@ public class ProductDao {
         }
         return availableQuantity;
     }
+    public ResultSet getExpiredProducts() {
+        java.sql.Date currentDate = new java.sql.Date(System.currentTimeMillis());
+        String query = "SELECT ProductID, ProductName, Quantity, ExpiryDate " +
+                "FROM Products " +
+                "WHERE ExpiryDate < ?";
+
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setDate(1, currentDate);
+            return preparedStatement.executeQuery();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+    public boolean isProductAlreadyExists(String productName, Date expiryDate) {
+        String query = "SELECT COUNT(*) FROM Products WHERE ProductName = ? AND ExpiryDate = ?";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, productName);
+            preparedStatement.setDate(2, expiryDate);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    int count = resultSet.getInt(1);
+                    return count > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+        }
+
+        return false;
+    }
+
+
+
 }

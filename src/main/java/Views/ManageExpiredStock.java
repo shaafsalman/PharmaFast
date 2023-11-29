@@ -1,127 +1,49 @@
 package Views;
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
+ */
 
 import Controllers.AdminController;
-import Models.Category;
 
 import javax.swing.*;
-import java.awt.*;
 import java.sql.SQLException;
 
-//final
 /**
  *
  * @author ShaafSalman
  */
-public class ManageCategory extends javax.swing.JFrame {
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
+public class ManageExpiredStock extends javax.swing.JFrame {
     AdminController adminController = new AdminController();
 
-    public ManageCategory() throws SQLException {
-
+    public ManageExpiredStock() throws SQLException
+    {
         initComponents();
-        adminController.initializeCategoryTable(tblCategory);
+         adminController.initializeExpiredProductsTable(tblExpiredStock);
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
     }
-    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) throws SQLException {
-        this.dispose();
-        ManagerDashboard managerDashboard= new ManagerDashboard();
-        managerDashboard.setVisible(true);
-    }
-    private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {
-        String categoryName = JOptionPane.showInputDialog(this, "Enter Category Name:");
-
-        if (categoryName != null && !categoryName.isEmpty()) {
-            Category newCategory = new Category(0, categoryName);
-            boolean categoryAdded = adminController.addCategory(newCategory);
-
-            if (categoryAdded) {
-                JOptionPane.showMessageDialog(this, "Category added successfully!");
-            } else {
-                JOptionPane.showMessageDialog(this, "Error adding the category. Please try again.");
-            }
-
-            adminController.initializeCategoryTable(tblCategory);
-        }
-    }
-    private void btnModifyActionPerformed(java.awt.event.ActionEvent evt) {
-        int selectedRow = tblCategory.getSelectedRow();
-
-        if (selectedRow == -1) {
-            JOptionPane.showMessageDialog(this, "Please select a category to modify.");
-            return;
-        }
-
-        int categoryID = 0;
-        categoryID = (int) tblCategory.getValueAt(selectedRow, 0);
-        String currentName = (String) tblCategory.getValueAt(selectedRow, 1);
-
-        String newName = JOptionPane.showInputDialog(this, "Enter a new name for the category:", currentName);
-
-        if (newName != null && !newName.isEmpty()) {
-            Category updatedCategory = new Category(categoryID, newName);
-            boolean updated = adminController.editCategory(updatedCategory);
-
-            if (updated)
-            {
-                adminController.initializeCategoryTable(tblCategory);
-            }
-            else
-            {
-                JOptionPane.showMessageDialog(this, "Failed to update the category name.");
-            }
-        }
-    }
-    private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {
-        int selectedRow = tblCategory.getSelectedRow();
-        if (selectedRow == -1) {
-            JOptionPane.showMessageDialog(this, "Please select a category to delete.");
-            return;
-        }
-        int categoryID = 0;
-        String name = (String) tblCategory.getValueAt(selectedRow, 1);
-        categoryID = (int) tblCategory.getValueAt(selectedRow, 0);
-        if (adminController.deleteCategory(categoryID)) {
-            adminController.initializeCategoryTable(tblCategory);
-        } else {
-            JOptionPane.showMessageDialog(this, "Failed to delete " + name + " " + categoryID);
-        }
-    }
-
-    public static void main(String args[]) {
-
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    new ManageCategory().setVisible(true);
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
-    }
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">
     private void initComponents() {
 
+        btnDelete = new javax.swing.JButton();
         pnlTittle = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         picUser = new javax.swing.JLabel();
         lblTittle = new javax.swing.JLabel();
         lblUsernameHeader = new javax.swing.JLabel();
         btnBack = new javax.swing.JButton();
-        btnAdd = new javax.swing.JButton();
-        btnDelete = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
-        tblCategory = new javax.swing.JTable();
-        btnModify = new javax.swing.JButton();
+        tblExpiredStock = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        btnDelete.setBackground(new java.awt.Color(204, 0, 0));
+        btnDelete.setFont(new java.awt.Font("Century Gothic", 1, 14)); // NOI18N
+        btnDelete.setForeground(new java.awt.Color(255, 255, 255));
+        btnDelete.setText("Delete");
 
         pnlTittle.setBackground(new java.awt.Color(102, 102, 102));
 
@@ -129,10 +51,11 @@ public class ManageCategory extends javax.swing.JFrame {
 
         lblTittle.setFont(new java.awt.Font("Century Gothic", 0, 24)); // NOI18N
         lblTittle.setForeground(new java.awt.Color(255, 255, 255));
-        lblTittle.setText("Manage Categories");
+        lblTittle.setText("Manage Expired Products");
 
         lblUsernameHeader.setFont(new java.awt.Font("Century Gothic", 1, 18)); // NOI18N
         lblUsernameHeader.setForeground(new java.awt.Color(255, 255, 255));
+
         adminController.setUser(lblUsernameHeader);
 
         btnBack.setBackground(new java.awt.Color(102, 102, 102));
@@ -156,7 +79,7 @@ public class ManageCategory extends javax.swing.JFrame {
                                 .addComponent(btnBack, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(lblTittle)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 353, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 240, Short.MAX_VALUE)
                                 .addGroup(pnlTittleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                         .addGroup(pnlTittleLayout.createSequentialGroup()
                                                 .addComponent(jLabel2)
@@ -184,47 +107,28 @@ public class ManageCategory extends javax.swing.JFrame {
                                 .addContainerGap(26, Short.MAX_VALUE))
         );
 
-        btnAdd.setBackground(new java.awt.Color(0, 153, 51));
-        btnAdd.setFont(new java.awt.Font("Century Gothic", 1, 14)); // NOI18N
-        btnAdd.setForeground(new java.awt.Color(255, 255, 255));
-        btnAdd.setText("Add");
-        btnAdd.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnAddActionPerformed(evt);
-            }
-        });
-
-        btnDelete.setBackground(new java.awt.Color(204, 0, 0));
-        btnDelete.setFont(new java.awt.Font("Century Gothic", 1, 14)); // NOI18N
-        btnDelete.setForeground(new java.awt.Color(255, 255, 255));
-        btnDelete.setText("Delete");
-        btnDelete.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnDeleteActionPerformed(evt);
-            }
-        });
-
-        tblCategory.setBackground(new java.awt.Color(102, 102, 102));
-        tblCategory.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        tblCategory.setFont(new java.awt.Font("Century Gothic", 1, 18)); // NOI18N
-        tblCategory.setModel(new javax.swing.table.DefaultTableModel(
+        tblExpiredStock.setBackground(new java.awt.Color(102, 102, 102));
+        tblExpiredStock.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        tblExpiredStock.setFont(new java.awt.Font("Century Gothic", 1, 18)); // NOI18N
+        tblExpiredStock.setModel(new javax.swing.table.DefaultTableModel(
                 new Object [][] {
                 },
                 new String [] {
-                        "Category ID", "Category Name", "Products"
+                        "Product  ID", "Porduct Name", "Quantity", "ExpiryDate"
                 }
-        ));
-        jScrollPane2.setViewportView(tblCategory);
+        ) {
+            boolean[] canEdit = new boolean [] {
+                    true, true, true, false
+            };
 
-        btnModify.setBackground(new java.awt.Color(0, 153, 204));
-        btnModify.setFont(new java.awt.Font("Century Gothic", 1, 14)); // NOI18N
-        btnModify.setForeground(new java.awt.Color(255, 255, 255));
-        btnModify.setText("Modify");
-        btnModify.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnModifyActionPerformed(evt);
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
             }
         });
+        tblExpiredStock.setColumnSelectionAllowed(true);
+        tblExpiredStock.getTableHeader().setReorderingAllowed(false);
+        jScrollPane2.setViewportView(tblExpiredStock);
+        tblExpiredStock.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -237,10 +141,6 @@ public class ManageCategory extends javax.swing.JFrame {
                                         .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING)
                                         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                                 .addGap(0, 0, Short.MAX_VALUE)
-                                                .addComponent(btnAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addGap(7, 7, 7)
-                                                .addComponent(btnModify, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                                 .addComponent(btnDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)))
                                 .addContainerGap())
         );
@@ -250,30 +150,89 @@ public class ManageCategory extends javax.swing.JFrame {
                                 .addContainerGap()
                                 .addComponent(pnlTittle, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(24, 24, 24)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(btnDelete, javax.swing.GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
-                                        .addComponent(btnAdd, javax.swing.GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
-                                        .addComponent(btnModify, javax.swing.GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE))
+                                .addComponent(btnDelete, javax.swing.GroupLayout.DEFAULT_SIZE, 41, Short.MAX_VALUE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 334, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addContainerGap())
         );
+        btnDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDeleteActionPerformed(evt);
+            }
+        });
 
         pack();
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        int x = (screenSize.width - getWidth()) / 2;
-        int y = (screenSize.height - getHeight()) / 2;
-        setLocation(x, y);
     }// </editor-fold>
-    private javax.swing.JButton btnAdd;
+    private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {
+        int selectedRow = tblExpiredStock.getSelectedRow();
+
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a product to delete.");
+            return;
+        }
+
+        int productID = (int) tblExpiredStock.getValueAt(selectedRow, 0);
+        String productName = (String) tblExpiredStock.getValueAt(selectedRow, 1);
+
+        boolean deleteResult = adminController.showDeleteProductDialog(productID, productName);
+
+        if (deleteResult) {
+            JOptionPane.showMessageDialog(this, "Product deleted successfully.");
+            adminController.initializeExpiredProductsTable(tblExpiredStock);
+        } else {
+            JOptionPane.showMessageDialog(this, "Failed to delete product.");
+        }
+    }
+    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) throws SQLException {
+        this.dispose();
+        ManagerDashboard managerDashboard= new ManagerDashboard();
+        managerDashboard.setVisible(true);
+    }
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(ManageExpiredStock.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(ManageExpiredStock.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(ManageExpiredStock.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(ManageExpiredStock.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    new ManageExpiredStock().setVisible(true);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+    }
+
+    // Variables declaration - do not modify
     private javax.swing.JButton btnBack;
     private javax.swing.JButton btnDelete;
-    private javax.swing.JButton btnModify;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel lblTittle;
     private javax.swing.JLabel lblUsernameHeader;
     private javax.swing.JLabel picUser;
     private javax.swing.JPanel pnlTittle;
-    private javax.swing.JTable tblCategory;
+    private javax.swing.JTable tblExpiredStock;
+    // End of variables declaration
 }

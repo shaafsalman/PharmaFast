@@ -28,6 +28,8 @@ public class ManageGraphs extends javax.swing.JFrame {
 
     public ManageGraphs() throws SQLException {
         initComponents();
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+
     }
     private void btnBack1ActionPerformed(java.awt.event.ActionEvent evt) throws SQLException {
         // TODO add your handling code here:
