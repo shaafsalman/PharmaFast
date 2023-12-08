@@ -216,6 +216,7 @@ public class TransactionHub extends javax.swing.JFrame {
 
             String pdfFilePath = reportGenerator.generateReceipt(tblCart, total, subTotal, vat, paidAmount, change);
             UtilityFunctions.displayReport(pdfFilePath);
+            jProgressBar1.setValue(100);
 
         }
         else

@@ -79,6 +79,7 @@ public class CsvReader
 
         return new Product(0, productName, costPrice, sellingPrice, quantity, categoryID, expiryDate);
     }
+
     private void processProduct(Product product, StringBuilder errorLog) {
         if (! categoryDao.isCategoryExists(product.getCategoryID())) {
             errorLog.append("CategoryID ").append(product.getCategoryID()).append(" does not exist in the Category table.\n");

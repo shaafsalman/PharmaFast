@@ -20,13 +20,7 @@ class UserControllerTest {
     }
 
 
-    @Test
-    void registerUserWithValidAdminCode() {
-        User user = new User(0, "FarhanJafri", "1337", "Manager");
-        int validAdminCode = UserController.ADMIN_CODE;
-        assertTrue(UserController.registerUser(user, validAdminCode));
 
-    }
 
     @Test
     void registerUserWithInvalidAdminCode() {

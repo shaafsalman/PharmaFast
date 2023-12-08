@@ -34,6 +34,8 @@ public class AddStock extends javax.swing.JFrame {
 
             progressBar.setValue(100);
         }
+
+        progressBar.setValue(100);
     }
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) throws SQLException {
         this.dispose();
